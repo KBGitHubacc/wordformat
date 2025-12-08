@@ -106,23 +106,15 @@ struct ContentView: View {
             Logger.shared.log("Loaded DOCX. Length \(mutableDoc.length) chars", category: "DOCX")
             Logger.shared.log("Log file path: \(Logger.shared.currentLogPath())", category: "LOG")
             
-            // Precompute paragraph texts for AI chunking
-            let paragraphTexts = extractParagraphTexts(from: mutableDoc)
-            Logger.shared.log("Paragraphs in source: \(paragraphTexts.count)", category: "DOCX")
-            
-            // AI Analysis Step
+            // AI Analysis Step (style-aware)
             var analysisResult: AnalysisResult? = nil
             if !openAIKey.isEmpty {
                 status = "Analysing structure with AI..."
                 let aiService = OpenAIService(apiKey: openAIKey)
-                // Extract plain text for AI
-                let plainText = mutableDoc.string
                 do {
-                    let ranges = try await aiService.analyseDocumentStructure(text: plainText)
-                    let levels = try await aiService.analyseParagraphLevels(paragraphs: paragraphTexts)
-                    analysisResult = AnalysisResult(classifiedRanges: ranges, paragraphLevels: levels)
-                    Logger.shared.log("AI returned \(ranges.count) classified ranges", category: "AI")
-                    Logger.shared.log("AI paragraph levels: \(levels.count)", category: "AI")
+                    analysisResult = try await aiService.analyseDocument(doc: mutableDoc)
+                    Logger.shared.log("AI paragraph types: \(analysisResult?.paragraphTypes.count ?? 0)", category: "AI")
+                    Logger.shared.log("AI paragraph levels: \(analysisResult?.paragraphLevels.count ?? 0)", category: "AI")
                 } catch {
                     status += "\nAI Error: \(error.localizedDescription).\nProceeding with offline heuristics only (formatting will still run)."
                     Logger.shared.log(error: error, category: "AI")

@@ -257,9 +257,18 @@ private func markerFormat(for level: Int) -> NSTextList.MarkerFormat {
 }
 
 private func findBodyStartIndex(in text: String, analysis: AnalysisResult?) -> Int {
-    // Prefer AI: find first block classified as body or heading and use its start
+    // Prefer style-aware paragraph types
+    if let types = analysis?.paragraphTypes, !types.isEmpty {
+        // Find first paragraph marked as intro/body/heading
+        let targetTypes: Set<LegalParagraphType> = [.intro, .body, .heading]
+        if let firstTarget = types.sorted(by: { $0.key < $1.key }).first(where: { targetTypes.contains($0.value) }) {
+            if let range = paragraphRange(forIndex: firstTarget.key, in: text) {
+                return range.location
+            }
+        }
+    }
+    // Legacy classifiedRanges
     if let analysis {
-        // Find the earliest occurrence of types that usually mark the body start
         let candidates = analysis.classifiedRanges.filter { $0.type == .body || $0.type == .heading || $0.type == .intro }
         if let earliest = candidates.min(by: { $0.range.location < $1.range.location }) {
             return earliest.range.location
@@ -267,6 +276,20 @@ private func findBodyStartIndex(in text: String, analysis: AnalysisResult?) -> I
     }
     // Fallback heuristic
     return findBodyStartIndex(in: text)
+}
+
+private func paragraphRange(forIndex target: Int, in text: String) -> NSRange? {
+    let ns = text as NSString
+    var idx = 0
+    var result: NSRange?
+    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { _, range, _, stop in
+        if idx == target {
+            result = range
+            stop.pointee = true
+        }
+        idx += 1
+    }
+    return result
 }
 
 private func findBodyStartIndex(in text: String) -> Int {
@@ -345,15 +368,8 @@ private func baseFontWithExistingTraits(baseFont: NSFont, existing: NSFont?) -> 
 func buildNumberingTargets(from doc: NSAttributedString, analysis: AnalysisResult?) -> [DocxNumberingPatcher.NumberingTarget] {
     let ns = doc.string as NSString
     var targets: [DocxNumberingPatcher.NumberingTarget] = []
-    // Read AI paragraph levels if present; default to empty when unavailable.
-    let aiLevels: [Int: Int] = {
-        guard let analysis else { return [:] }
-        let mirror = Mirror(reflecting: analysis)
-        if let levels = mirror.children.first(where: { $0.label == "paragraphLevels" })?.value as? [Int: Int] {
-            return levels
-        }
-        return [:]
-    }()
+    let aiLevels = analysis?.paragraphLevels ?? [:]
+    let aiTypes = analysis?.paragraphTypes ?? [:]
     let splitIndex = findBodyStartIndex(in: doc.string, analysis: analysis)
     Logger.shared.log("Target builder using splitIndex \(splitIndex)", category: "PATCH")
     
@@ -365,7 +381,8 @@ func buildNumberingTargets(from doc: NSAttributedString, analysis: AnalysisResul
         if text.isEmpty { return }
         
         // Heading detection
-        let isHeadingPara = isHeading(text)
+        let aiType = aiTypes[paraIndex]
+        let isHeadingPara = isHeading(text) || aiType == .heading || aiType == .documentTitle || aiType == .headerMetadata
         if isHeadingPara { return }
         
         let attrStyle = doc.attribute(.paragraphStyle, at: range.location, effectiveRange: nil) as? NSParagraphStyle
@@ -417,4 +434,3 @@ private func makeTypeLookup(analysis: AnalysisResult?) -> (NSRange) -> LegalPara
         return nil
     }
 }
-

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AppKit
 
 struct OpenAIService {
     private let apiKey: String
@@ -15,6 +16,38 @@ struct OpenAIService {
         self.apiKey = apiKey
     }
     
+    // MARK: - Attribute Extraction
+    
+    /// Extract paragraph text plus key style hints to improve AI classification.
+    func extractParagraphMetadata(from doc: NSAttributedString) -> [ParagraphMetadata] {
+        var metas: [ParagraphMetadata] = []
+        let ns = doc.string as NSString
+        var index = 0
+        ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, range, _, _ in
+            defer { index += 1 }
+            let raw = substring ?? ""
+            let text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            if text.isEmpty { return }
+            
+            let font = doc.attribute(.font, at: range.location, effectiveRange: nil) as? NSFont
+            let style = doc.attribute(.paragraphStyle, at: range.location, effectiveRange: nil) as? NSParagraphStyle
+            let isBold = font?.fontDescriptor.symbolicTraits.contains(.bold) ?? false
+            let isCaps = text.count > 3 && text == text.uppercased()
+            let isCentered = style?.alignment == .center
+            let words = text.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+            
+            metas.append(ParagraphMetadata(
+                id: index,
+                text: text,
+                isBold: isBold,
+                isUppercased: isCaps,
+                isCentered: isCentered,
+                wordCount: words.count
+            ))
+        }
+        return metas
+    }
+
     /// Returns the preferred available model id from the account, with graceful fallback.
     /// Priority order (skips code/embedding/audio models): gpt-5.1-mini, gpt-5-mini, gpt-5.1, gpt-5,
     /// gpt-4.1, gpt-4.1-mini, gpt-4o-mini, gpt-4o.
@@ -174,6 +207,116 @@ struct OpenAIService {
         // If AI fails to cover everything, we might have gaps.
         // For this hybrid approach, if we get results, we use them.
         return ranges
+    }
+    
+    /// Style-aware analysis: chunk paragraphs with style metadata and classify by index.
+    func analyseDocument(doc: NSAttributedString) async throws -> AnalysisResult {
+        let metas = extractParagraphMetadata(from: doc)
+        Logger.shared.log("AI style-aware: \(metas.count) non-empty paragraphs to classify", category: "AI")
+        let allParagraphsAligned = extractAllParagraphs(from: doc)
+        Logger.shared.log("Total paragraphs (including empty): \(allParagraphsAligned.count)", category: "AI")
+        
+        let chunkSize = 40
+        var paragraphTypes: [Int: LegalParagraphType] = [:]
+        
+        var start = 0
+        while start < metas.count {
+            let end = min(start + chunkSize, metas.count)
+            let chunk = Array(metas[start..<end])
+            do {
+                let chunkResult = try await sendMetaBatchToAI(chunk: chunk)
+                paragraphTypes.merge(chunkResult) { _, new in new }
+                Logger.shared.log("AI chunk \(start)-\(end) classified \(chunkResult.count)", category: "AI")
+            } catch {
+                Logger.shared.log("AI chunk \(start)-\(end) failed: \(error.localizedDescription)", category: "AI")
+            }
+            start = end
+        }
+        
+        // Optionally also derive levels from text-only routine to reuse existing logic
+        let levels = try? await analyseParagraphLevels(paragraphs: allParagraphsAligned)
+        
+        return AnalysisResult(
+            classifiedRanges: [],
+            paragraphTypes: paragraphTypes,
+            paragraphLevels: levels ?? [:]
+        )
+    }
+    
+    private func sendMetaBatchToAI(chunk: [ParagraphMetadata]) async throws -> [Int: LegalParagraphType] {
+        let model = try await selectBestModel()
+        let jsonData = try JSONEncoder().encode(chunk)
+        let jsonString = String(data: jsonData, encoding: .utf8) ?? "[]"
+        
+        let prompt = """
+        You are a legal document formatter.
+        Classify each paragraph in the JSON array below.
+        
+        Input element fields: id, text, isBold, isUppercased, isCentered, wordCount.
+        
+        Type rules:
+        - "header": court/tribunal names, case refs, parties, BETWEEN, up to but not including the witness statement title.
+        - "title": main document title (e.g., WITNESS STATEMENT OF ...), often uppercase & bold & centered.
+        - "intro": the "I, Name, will say as follows" paragraph.
+        - "heading": short (usually < 12 words), often bold/uppercase section headings like "A. INTRODUCTION".
+        - "body": main numbered narrative paragraphs.
+        - "statementOfTruth": contains statement of truth language.
+        - "signature": signature/date lines.
+        - "quote": indented or obviously quoted blocks.
+        
+        Return only JSON: {"classifications":[{"id":0,"type":"body"}, ...]}
+        """
+        
+        var request = URLRequest(url: URL(string: "https://api.openai.com/v1/chat/completions")!)
+        request.httpMethod = "POST"
+        request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 120
+        
+        let body: [String: Any] = [
+            "model": model,
+            "messages": [
+                ["role": "system", "content": "You categorize legal paragraphs accurately with attention to style cues."],
+                ["role": "user", "content": prompt + "\n\nInput:\n\(jsonString)"]
+            ],
+            "response_format": ["type": "json_object"]
+        ]
+        
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        Logger.shared.log("AI meta chunk send (\(chunk.count) items, model \(model))", category: "AI")
+        let (data, _) = try await URLSession.shared.data(for: request)
+        Logger.shared.log("AI meta chunk recv \(data.count) bytes", category: "AI")
+        
+        struct Resp: Decodable {
+            struct Item: Decodable { let id: Int; let type: String }
+            let classifications: [Item]
+        }
+        
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let choices = json["choices"] as? [[String: Any]],
+              let msg = choices.first?["message"] as? [String: Any],
+              let content = msg["content"] as? String,
+              let cdata = content.data(using: .utf8) else {
+            throw NSError(domain: "OpenAI", code: -1, userInfo: [NSLocalizedDescriptionKey: "Bad response structure"])
+        }
+        
+        let parsed = try JSONDecoder().decode(Resp.self, from: cdata)
+        var map: [Int: LegalParagraphType] = [:]
+        for item in parsed.classifications {
+            let t = LegalParagraphType(rawValue: item.type) ?? .body
+            map[item.id] = t
+        }
+        return map
+    }
+    
+    // Extract every paragraph string (including empty) to keep indices aligned.
+    private func extractAllParagraphs(from doc: NSAttributedString) -> [String] {
+        var arr: [String] = []
+        let ns = doc.string as NSString
+        ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, _, _, _ in
+            arr.append(substring ?? "")
+        }
+        return arr
     }
     
     /// Chunked per-paragraph analysis to classify level (0/1/2) and type.

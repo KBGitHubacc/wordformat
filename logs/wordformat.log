@@ -1,82 +1,28 @@
 
-=== wordformat run 2025-12-08 16:02:14 +0000 ===
+=== wordformat run 2025-12-08 16:48:10 +0000 ===
 
-[2025-12-08 17:02:14.063][UI] Selected file: /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07.docx
-[2025-12-08 17:02:14.096][DOCX] Loaded DOCX. Length 125049 chars
-[2025-12-08 17:02:14.100][LOG] Log file path: /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/Downloads/Developer/wordformat/logs/wordformat.log
-[2025-12-08 17:02:14.105][DOCX] Paragraphs in source: 411
-[2025-12-08 17:02:14.108][AI] Requesting model list…
-[2025-12-08 17:02:15.321][AI] Received AI response (13442 bytes)
-[2025-12-08 17:02:15.328][AI] Model list: ["gpt-4-0613", "gpt-4", "gpt-3.5-turbo", "gpt-5.1-codex-max", "gpt-5.1-2025-11-13", "gpt-5.1", "gpt-5.1-codex", "gpt-5.1-codex-mini", "davinci-002", "babbage-002", "gpt-3.5-turbo-instruct", "gpt-3.5-turbo-instruct-0914", "dall-e-3", "dall-e-2", "gpt-4-1106-preview", "gpt-3.5-turbo-1106", "tts-1-hd", "tts-1-1106", "tts-1-hd-1106", "text-embedding-3-small", "text-embedding-3-large", "gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-3.5-turbo-0125", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-mini-2024-07-18", "gpt-4o-mini", "gpt-4o-2024-08-06", "chatgpt-4o-latest", "gpt-4o-audio-preview", "gpt-4o-realtime-preview", "omni-moderation-latest", "omni-moderation-2024-09-26", "gpt-4o-realtime-preview-2024-12-17", "gpt-4o-audio-preview-2024-12-17", "gpt-4o-mini-realtime-preview-2024-12-17", "gpt-4o-mini-audio-preview-2024-12-17", "o1-2024-12-17", "o1", "gpt-4o-mini-realtime-preview", "gpt-4o-mini-audio-preview", "o3-mini", "o3-mini-2025-01-31", "gpt-4o-2024-11-20", "gpt-4o-search-preview-2025-03-11", "gpt-4o-search-preview", "gpt-4o-mini-search-preview-2025-03-11", "gpt-4o-mini-search-preview", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "o1-pro-2025-03-19", "o1-pro", "gpt-4o-mini-tts", "o3-2025-04-16", "o4-mini-2025-04-16", "o3", "o4-mini", "gpt-4.1-2025-04-14", "gpt-4.1", "gpt-4.1-mini-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano-2025-04-14", "gpt-4.1-nano", "gpt-image-1", "codex-mini-latest", "o3-pro", "gpt-4o-realtime-preview-2025-06-03", "gpt-4o-audio-preview-2025-06-03", "o3-pro-2025-06-10", "o4-mini-deep-research", "o3-deep-research", "gpt-4o-transcribe-diarize", "o3-deep-research-2025-06-26", "o4-mini-deep-research-2025-06-26", "gpt-5-chat-latest", "gpt-5-2025-08-07", "gpt-5", "gpt-5-mini-2025-08-07", "gpt-5-mini", "gpt-5-nano-2025-08-07", "gpt-5-nano", "gpt-audio-2025-08-28", "gpt-realtime", "gpt-realtime-2025-08-28", "gpt-audio", "gpt-5-codex", "gpt-image-1-mini", "gpt-5-pro-2025-10-06", "gpt-5-pro", "gpt-audio-mini", "gpt-audio-mini-2025-10-06", "gpt-5-search-api", "gpt-realtime-mini", "gpt-realtime-mini-2025-10-06", "sora-2", "sora-2-pro", "gpt-5-search-api-2025-10-14", "gpt-5.1-chat-latest", "gpt-3.5-turbo-16k", "tts-1", "whisper-1", "text-embedding-ada-002"]
-[2025-12-08 17:02:15.355][AI] Selected model: gpt-5-mini
-[2025-12-08 17:02:15.361][AI] Sending chat request to api.openai.com with model gpt-5-mini and body 8000 chars
-[2025-12-08 17:03:48.874][AI] AI chunk 0-40 sending with model gpt-5-mini
-[2025-12-08 17:04:23.010][AI] AI chunk 0-40 response 1535 bytes
-[2025-12-08 17:04:23.020][AI] AI chunk 40-80 sending with model gpt-5-mini
-[2025-12-08 17:04:44.110][AI] AI chunk 40-80 response 1368 bytes
-[2025-12-08 17:04:44.113][AI] AI chunk 80-120 sending with model gpt-5-mini
-[2025-12-08 17:05:13.746][AI] AI chunk 80-120 response 1639 bytes
-[2025-12-08 17:05:13.759][AI] AI chunk 120-160 sending with model gpt-5-mini
-[2025-12-08 17:05:28.744][AI] AI chunk 120-160 response 1751 bytes
-[2025-12-08 17:05:28.746][AI] AI chunk 160-200 sending with model gpt-5-mini
-[2025-12-08 17:06:01.040][AI] AI chunk 160-200 response 1465 bytes
-[2025-12-08 17:06:01.042][AI] AI chunk 200-240 sending with model gpt-5-mini
-[2025-12-08 17:06:22.539][AI] AI chunk 200-240 response 1441 bytes
-[2025-12-08 17:06:22.552][AI] AI chunk 240-280 sending with model gpt-5-mini
-[2025-12-08 17:07:19.297][AI] AI chunk 240-280 response 1513 bytes
-[2025-12-08 17:07:19.309][AI] AI chunk 280-320 sending with model gpt-5-mini
-[2025-12-08 17:07:52.274][AI] AI chunk 280-320 response 2091 bytes
-[2025-12-08 17:07:52.277][AI] AI chunk 320-360 sending with model gpt-5-mini
-[2025-12-08 17:08:22.664][AI] AI chunk 320-360 response 1585 bytes
-[2025-12-08 17:08:22.677][AI] AI chunk 360-400 sending with model gpt-5-mini
-[2025-12-08 17:08:52.550][AI] AI chunk 360-400 response 1393 bytes
-[2025-12-08 17:08:52.562][AI] AI chunk 400-411 sending with model gpt-5-mini
-[2025-12-08 17:08:59.579][AI] AI chunk 400-411 response 1053 bytes
-[2025-12-08 17:08:59.590][AI] AI paragraph levels collected: 317 of 411
-[2025-12-08 17:08:59.595][AI] AI returned 10 classified ranges
-[2025-12-08 17:08:59.600][AI] AI paragraph levels: 317
-[2025-12-08 17:08:59.607][FORMAT] Applying formatting…
-[2025-12-08 17:08:59.614][FORMAT] Formatting start. Total length: 125049
-[2025-12-08 17:08:59.623][FORMAT] Split index at 894
-[2025-12-08 17:08:59.627][FORMAT] Header length: 894, body length: 124155
-[2025-12-08 17:08:59.630][FORMAT] Body paragraphs (approx): 383
-[2025-12-08 17:08:59.632][FORMAT] Para level 1 heading:false truth:false text: I, Kevin Hastings of 21 Corbet Close, Wallington SM6 7GB will say as follows:
-[2025-12-08 17:08:59.636][FORMAT] Para level 1 heading:false truth:false text: I have served as the Chair of the 8 Artillery Row Residents Association since its inception until present day. Although 
-[2025-12-08 17:08:59.638][FORMAT] Para level 1 heading:false truth:false text: The facts and matter set out in this statement are within my own knowledge unless otherwise stated, and I believe them t
-[2025-12-08 17:08:59.640][FORMAT] Para level 1 heading:false truth:false text: WITNESS STATEMENT OF KEVIN HASTINGS
-[2025-12-08 17:08:59.642][FORMAT] Para level 1 heading:false truth:false text: I, Kevin Hastings of 21 Corbet Close, Wallington SM6 7GB will say as follows:
-[2025-12-08 17:08:59.644][FORMAT] Para level 1 heading:false truth:false text: I have served as the Chair of the 8 Artillery Row Residents Association since its inception until presentday. Although I
-[2025-12-08 17:08:59.646][FORMAT] Para level 1 heading:false truth:false text: The facts and matter set out in this statement are within my own knowledge unless otherwise stated, and I believe them t
-[2025-12-08 17:08:59.648][FORMAT] Para level 0 heading:true truth:false text: A. INTRODUCTION AND CAPACITY
-[2025-12-08 17:08:59.650][FORMAT] Para level 1 heading:false truth:false text: I lived at 8 Artillery Row with my family from April 2016 until May 2024. I helped to set up, and have since served as C
-[2025-12-08 17:08:59.652][FORMAT] Para level 1 heading:false truth:false text: I make this statement on behalf of the Applicants. The facts and matters set out are within my own knowledge, or are der
-[2025-12-08 17:08:59.654][FORMAT] Para level 1 heading:false truth:false text: This statement supports the Applicants’ challenge to the service charges demanded for the years 2017–2024. It addresses,
-[2025-12-08 17:08:59.656][FORMAT] Para level 1 heading:false truth:false text: The statement is intended to be read alongside the Applicants’ Scott Schedule (filed on 2 September 2025) and Statement 
-[2025-12-08 17:08:59.658][FORMAT] Para level 1 heading:false truth:false text: Category
-[2025-12-08 17:08:59.659][FORMAT] Para level 1 heading:false truth:false text: Reason for reduction
-[2025-12-08 17:08:59.661][FORMAT] Para level 1 heading:false truth:false text: Period of overcharge/double charge
-[2025-12-08 17:08:59.663][FORMAT] Para level 1 heading:false truth:false text: Amount claimed
-[2025-12-08 17:08:59.666][FORMAT] Para level 1 heading:false truth:false text: Heat and Hot water
-[2025-12-08 17:08:59.668][FORMAT] Para level 1 heading:false truth:false text: Duplicated maintenance/admin costs
-[2025-12-08 17:08:59.669][FORMAT] Para level 1 heading:false truth:false text: 2017 to date
-[2025-12-08 17:08:59.671][FORMAT] Para level 1 heading:false truth:false text: £10,000 (or whatever the figure is)
-[2025-12-08 17:08:59.673][FORMAT] Para level 1 heading:false truth:false text: Electricity charges
-[2025-12-08 17:08:59.675][FORMAT] Para level 1 heading:false truth:false text: Double charging of communal supply
-[2025-12-08 17:08:59.677][FORMAT] Para level 1 heading:false truth:false text: 2015 to date
-[2025-12-08 17:08:59.679][FORMAT] Para level 1 heading:false truth:false text: £1.3m
-[2025-12-08 17:08:59.681][FORMAT] Para level 1 heading:false truth:false text: AES Systems plant or Heat Interface Maintenance
-[2025-12-08 17:08:59.684][FORMAT] Level counts -> level0:5 level1:311 level2:0 level3:0
-[2025-12-08 17:08:59.686][DOCX] Saved formatted DOCX to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx
-[2025-12-08 17:08:59.687][PATCH] Target builder using splitIndex 894
-[2025-12-08 17:08:59.689][PATCH] Built 50 numbering targets from document paragraphs
-[2025-12-08 17:08:59.691][PATCH] Patcher will apply numbering to 50 paragraphs
-[2025-12-08 17:08:59.692][PATCH] Patcher: start for Draft Witness Statement of KH 2025.12.07_UKLegal.docx with 50 targets
-[2025-12-08 17:08:59.723][PATCH] Patcher: unzip ok to /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/tmp/wordformat-patch-50CD7B40-DD68-44ED-9FF7-C37DD54DB371
-[2025-12-08 17:08:59.725][PATCH] Patcher: numbering.xml missing, creating…
-[2025-12-08 17:08:59.727][PATCH] Patcher: added rel for numbering.xml
-[2025-12-08 17:08:59.729][PATCH] Patcher: added content-type override for numbering.xml
-[2025-12-08 17:08:59.730][PATCH] Patcher: injecting numbering into document.xml
-[2025-12-08 17:08:59.738][PATCH] Patcher: inject complete
-[2025-12-08 17:08:59.787][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
-[2025-12-08 17:08:59.788][PATCH] Patcher: replaced original DOCX with patched version
-[2025-12-08 17:08:59.858][PATCH] Patcher completed successfully
+[2025-12-08 17:48:10.964][UI] Selected file: /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07.docx
+[2025-12-08 17:48:10.996][DOCX] Loaded DOCX. Length 125049 chars
+[2025-12-08 17:48:10.996][LOG] Log file path: /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/Downloads/Developer/wordformat/logs/wordformat.log
+[2025-12-08 17:48:11.011][AI] AI style-aware: 343 non-empty paragraphs to classify
+[2025-12-08 17:48:11.012][AI] Total paragraphs (including empty): 411
+[2025-12-08 17:48:11.014][AI] Requesting model list…
+[2025-12-08 17:48:11.973][AI] Received AI response (13442 bytes)
+[2025-12-08 17:48:11.978][AI] Model list: ["gpt-4-0613", "gpt-4", "gpt-3.5-turbo", "gpt-5.1-codex-max", "gpt-5.1-2025-11-13", "gpt-5.1", "gpt-5.1-codex", "gpt-5.1-codex-mini", "davinci-002", "babbage-002", "gpt-3.5-turbo-instruct", "gpt-3.5-turbo-instruct-0914", "dall-e-3", "dall-e-2", "gpt-4-1106-preview", "gpt-3.5-turbo-1106", "tts-1-hd", "tts-1-1106", "tts-1-hd-1106", "text-embedding-3-small", "text-embedding-3-large", "gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-3.5-turbo-0125", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-mini-2024-07-18", "gpt-4o-mini", "gpt-4o-2024-08-06", "chatgpt-4o-latest", "gpt-4o-audio-preview", "gpt-4o-realtime-preview", "omni-moderation-latest", "omni-moderation-2024-09-26", "gpt-4o-realtime-preview-2024-12-17", "gpt-4o-audio-preview-2024-12-17", "gpt-4o-mini-realtime-preview-2024-12-17", "gpt-4o-mini-audio-preview-2024-12-17", "o1-2024-12-17", "o1", "gpt-4o-mini-realtime-preview", "gpt-4o-mini-audio-preview", "o3-mini", "o3-mini-2025-01-31", "gpt-4o-2024-11-20", "gpt-4o-search-preview-2025-03-11", "gpt-4o-search-preview", "gpt-4o-mini-search-preview-2025-03-11", "gpt-4o-mini-search-preview", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "o1-pro-2025-03-19", "o1-pro", "gpt-4o-mini-tts", "o3-2025-04-16", "o4-mini-2025-04-16", "o3", "o4-mini", "gpt-4.1-2025-04-14", "gpt-4.1", "gpt-4.1-mini-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano-2025-04-14", "gpt-4.1-nano", "gpt-image-1", "codex-mini-latest", "o3-pro", "gpt-4o-realtime-preview-2025-06-03", "gpt-4o-audio-preview-2025-06-03", "o3-pro-2025-06-10", "o4-mini-deep-research", "o3-deep-research", "gpt-4o-transcribe-diarize", "o3-deep-research-2025-06-26", "o4-mini-deep-research-2025-06-26", "gpt-5-chat-latest", "gpt-5-2025-08-07", "gpt-5", "gpt-5-mini-2025-08-07", "gpt-5-mini", "gpt-5-nano-2025-08-07", "gpt-5-nano", "gpt-audio-2025-08-28", "gpt-realtime", "gpt-realtime-2025-08-28", "gpt-audio", "gpt-5-codex", "gpt-image-1-mini", "gpt-5-pro-2025-10-06", "gpt-5-pro", "gpt-audio-mini", "gpt-audio-mini-2025-10-06", "gpt-5-search-api", "gpt-realtime-mini", "gpt-realtime-mini-2025-10-06", "sora-2", "sora-2-pro", "gpt-5-search-api-2025-10-14", "gpt-5.1-chat-latest", "gpt-3.5-turbo-16k", "tts-1", "whisper-1", "text-embedding-ada-002"]
+[2025-12-08 17:48:11.983][AI] Selected model: gpt-5-mini
+[2025-12-08 17:48:11.990][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:48:37.208][AI] AI meta chunk recv 2082 bytes
+[2025-12-08 17:48:37.218][AI] AI chunk 0-40 classified 40
+[2025-12-08 17:48:37.227][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:49:02.654][AI] AI meta chunk recv 2013 bytes
+[2025-12-08 17:49:02.655][AI] AI chunk 40-80 classified 40
+[2025-12-08 17:49:02.658][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:49:25.993][AI] AI meta chunk recv 2049 bytes
+[2025-12-08 17:49:25.995][AI] AI chunk 80-120 classified 40
+[2025-12-08 17:49:26.015][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:49:44.327][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 17:49:44.329][AI] AI chunk 120-160 classified 40
+[2025-12-08 17:49:44.343][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:50:00.256][AI] AI meta chunk recv 2054 bytes
+[2025-12-08 17:50:00.258][AI] AI chunk 160-200 classified 40
+[2025-12-08 17:50:00.268][AI] AI meta chunk send (40 items, model gpt-5-mini)

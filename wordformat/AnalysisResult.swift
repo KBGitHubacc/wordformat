@@ -20,7 +20,10 @@ enum LegalParagraphType: String, Codable {
 }
 
 struct AnalysisResult {
+    /// Legacy range-based classifications (kept for backward compatibility).
     var classifiedRanges: [FormattedRange] = []
+    /// Index-precise paragraph type map produced by style-aware AI.
+    var paragraphTypes: [Int: LegalParagraphType] = [:]
     /// Optional per-paragraph level classification (0=main,1=sub,a;2=subsub,i)
     var paragraphLevels: [Int: Int] = [:]
     
@@ -28,4 +31,13 @@ struct AnalysisResult {
         var range: NSRange
         var type: LegalParagraphType
     }
+}
+
+struct ParagraphMetadata: Encodable {
+    let id: Int
+    let text: String
+    let isBold: Bool
+    let isUppercased: Bool
+    let isCentered: Bool
+    let wordCount: Int
 }

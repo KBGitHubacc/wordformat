@@ -247,23 +247,29 @@ struct OpenAIService {
         let model = try await selectBestModel()
         let jsonData = try JSONEncoder().encode(chunk)
         let jsonString = String(data: jsonData, encoding: .utf8) ?? "[]"
-        
+
         let prompt = """
-        You are a legal document formatter.
+        You are a UK legal document formatter analyzing a witness statement.
         Classify each paragraph in the JSON array below.
-        
+
         Input element fields: id, text, isBold, isUppercased, isCentered, wordCount.
-        
-        Type rules:
-        - "header": court/tribunal names, case refs, parties, BETWEEN, up to but not including the witness statement title.
-        - "title": main document title (e.g., WITNESS STATEMENT OF ...), often uppercase & bold & centered.
-        - "intro": the "I, Name, will say as follows" paragraph.
-        - "heading": short (usually < 12 words), often bold/uppercase section headings like "A. INTRODUCTION".
-        - "body": main numbered narrative paragraphs.
-        - "statementOfTruth": contains statement of truth language.
-        - "signature": signature/date lines.
-        - "quote": indented or obviously quoted blocks.
-        
+
+        CRITICAL TYPE RULES (apply in order):
+        - "header": Court/tribunal names (e.g., "IN THE FIRST-TIER TRIBUNAL"), case references, "BETWEEN" sections, party names (Applicant/Respondent). These are the opening metadata BEFORE the witness statement title.
+        - "title": The main document title like "WITNESS STATEMENT OF [NAME]" - typically uppercase, bold, centered. This is a single paragraph, NOT numbered.
+        - "intro": The introductory paragraph that typically contains "will say as follows" - e.g., "I, [Name], of [Address] will say as follows:". This is NOT numbered.
+        - "heading": Section headings like "A. INTRODUCTION", "B. BACKGROUND" - short (< 12 words), uppercase letters followed by period and title. NOT numbered but formatted differently.
+        - "body": Main narrative paragraphs that should be numbered (1, 2, 3...). These are the substantive content of the statement.
+        - "statementOfTruth": Contains "statement of truth" or "I believe the facts stated" - appears near the end. NOT numbered.
+        - "signature": Date lines, signature blocks, witness name at end. NOT numbered.
+        - "quote": Block quotes or obviously indented referenced text. May be numbered as sub-paragraphs.
+
+        IMPORTANT:
+        - The "title" (WITNESS STATEMENT OF...) should NEVER be "body"
+        - The "intro" (I, Name, will say...) should NEVER be "body"
+        - Section headings (A. INTRODUCTION, B. FACTS) should be "heading", not "body"
+        - Only actual narrative paragraphs should be "body"
+
         Return only JSON: {"classifications":[{"id":0,"type":"body"}, ...]}
         """
         
@@ -382,11 +388,20 @@ struct OpenAIService {
         let joined = lines.joined(separator: "\n")
         return """
         For each paragraph below, return JSON: {"items":[{"i":index,"level":N}]}
-        level 0 = main numbered paragraph
-        level 1 = subparagraph (a,b,c)
-        level 2 = sub-subparagraph (i,ii,iii)
-        Headings or titles should be omitted from the list.
-        Use best judgment based on numbering/indent/context.
+
+        UK Legal Document Numbering Levels:
+        - level 0 = main numbered paragraph (numbered as 1., 2., 3., etc.)
+        - level 1 = subparagraph (numbered as (a), (b), (c), etc. or a), b), c))
+        - level 2 = sub-subparagraph (numbered as (i), (ii), (iii), etc. or i), ii), iii))
+
+        RULES:
+        1. Look for existing numbering patterns: "1.", "2.", "(a)", "a)", "(i)", "i)" etc.
+        2. If a paragraph starts with a number followed by period/bracket, it's level 0
+        3. If a paragraph starts with a letter (a-z) in parentheses or followed by ), it's level 1
+        4. If a paragraph starts with roman numerals (i, ii, iii, iv, v, vi, vii, viii, ix, x), it's level 2
+        5. OMIT from the list: headings, titles, intro paragraphs ("will say as follows"), statement of truth
+        6. If unsure and paragraph looks like narrative content, default to level 0
+
         Paragraphs:
         \(joined)
         """

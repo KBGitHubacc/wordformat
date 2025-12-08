@@ -114,6 +114,7 @@ private func generateHTML(
     var hasOpenMainListItem = false
     var isInSubList = false
     var lastMainNumber: Int = 0
+    var lastSubIndex: Int = 0
     
     for item in structure {
         // Skip header items from the original doc as we just generated a fresh one
@@ -165,6 +166,7 @@ private func generateHTML(
                     html += "</ol></li>"
                     isInSubList = false
                     hasOpenMainListItem = false
+                    lastSubIndex = 0
                 } else if hasOpenMainListItem {
                     html += "</li>"
                     hasOpenMainListItem = false
@@ -201,7 +203,14 @@ private func generateHTML(
                     html += "<ol class='sublist' type='a' start='\(startValue)'>"
                     isInSubList = true
                 }
-                html += "<li><p>\(content)</p></li>"
+
+                if startValue != lastSubIndex + 1 {
+                    html += "<li value='\(startValue)'><p>\(content)</p></li>"
+                } else {
+                    html += "<li><p>\(content)</p></li>"
+                }
+
+                lastSubIndex = startValue
 
             case .none:
                 // Treat as a standard paragraph outside of numbered lists
@@ -209,6 +218,7 @@ private func generateHTML(
                     html += "</ol></li>"
                     isInSubList = false
                     hasOpenMainListItem = false
+                    lastSubIndex = 0
                 } else if hasOpenMainListItem {
                     html += "</li>"
                     hasOpenMainListItem = false

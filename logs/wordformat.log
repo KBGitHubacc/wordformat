@@ -368,3 +368,720 @@
 [2025-12-08 20:02:09.143][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
 [2025-12-08 20:02:09.144][PATCH] Patcher: replaced original DOCX with patched version
 [2025-12-08 20:02:09.146][PATCH] Patcher completed successfully
+
+=== wordformat run 2025-12-08 19:17:08 +0000 ===
+
+[2025-12-08 20:17:08.068][UI] Selected file: /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07.docx
+[2025-12-08 20:17:08.105][DOCX] Loaded DOCX for analysis. Length 125049 chars
+[2025-12-08 20:17:08.111][LOG] Log file path: /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/Downloads/Developer/wordformat/logs/wordformat.log
+[2025-12-08 20:17:08.121][AI] AI style-aware: 411 non-empty paragraphs to classify
+[2025-12-08 20:17:08.132][AI] Total paragraphs (including empty): 411
+[2025-12-08 20:17:08.137][AI] Requesting model list…
+[2025-12-08 20:17:08.858][AI] Received AI response (13442 bytes)
+[2025-12-08 20:17:08.869][AI] Model list: ["gpt-4-0613", "gpt-4", "gpt-3.5-turbo", "gpt-5.1-codex-max", "gpt-5.1-2025-11-13", "gpt-5.1", "gpt-5.1-codex", "gpt-5.1-codex-mini", "davinci-002", "babbage-002", "gpt-3.5-turbo-instruct", "gpt-3.5-turbo-instruct-0914", "dall-e-3", "dall-e-2", "gpt-4-1106-preview", "gpt-3.5-turbo-1106", "tts-1-hd", "tts-1-1106", "tts-1-hd-1106", "text-embedding-3-small", "text-embedding-3-large", "gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-3.5-turbo-0125", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-mini-2024-07-18", "gpt-4o-mini", "gpt-4o-2024-08-06", "chatgpt-4o-latest", "gpt-4o-audio-preview", "gpt-4o-realtime-preview", "omni-moderation-latest", "omni-moderation-2024-09-26", "gpt-4o-realtime-preview-2024-12-17", "gpt-4o-audio-preview-2024-12-17", "gpt-4o-mini-realtime-preview-2024-12-17", "gpt-4o-mini-audio-preview-2024-12-17", "o1-2024-12-17", "o1", "gpt-4o-mini-realtime-preview", "gpt-4o-mini-audio-preview", "o3-mini", "o3-mini-2025-01-31", "gpt-4o-2024-11-20", "gpt-4o-search-preview-2025-03-11", "gpt-4o-search-preview", "gpt-4o-mini-search-preview-2025-03-11", "gpt-4o-mini-search-preview", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "o1-pro-2025-03-19", "o1-pro", "gpt-4o-mini-tts", "o3-2025-04-16", "o4-mini-2025-04-16", "o3", "o4-mini", "gpt-4.1-2025-04-14", "gpt-4.1", "gpt-4.1-mini-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano-2025-04-14", "gpt-4.1-nano", "gpt-image-1", "codex-mini-latest", "o3-pro", "gpt-4o-realtime-preview-2025-06-03", "gpt-4o-audio-preview-2025-06-03", "o3-pro-2025-06-10", "o4-mini-deep-research", "o3-deep-research", "gpt-4o-transcribe-diarize", "o3-deep-research-2025-06-26", "o4-mini-deep-research-2025-06-26", "gpt-5-chat-latest", "gpt-5-2025-08-07", "gpt-5", "gpt-5-mini-2025-08-07", "gpt-5-mini", "gpt-5-nano-2025-08-07", "gpt-5-nano", "gpt-audio-2025-08-28", "gpt-realtime", "gpt-realtime-2025-08-28", "gpt-audio", "gpt-5-codex", "gpt-image-1-mini", "gpt-5-pro-2025-10-06", "gpt-5-pro", "gpt-audio-mini", "gpt-audio-mini-2025-10-06", "gpt-5-search-api", "gpt-realtime-mini", "gpt-realtime-mini-2025-10-06", "sora-2", "sora-2-pro", "gpt-5-search-api-2025-10-14", "gpt-5.1-chat-latest", "gpt-3.5-turbo-16k", "tts-1", "whisper-1", "text-embedding-ada-002"]
+[2025-12-08 20:17:08.879][AI] Selected model: gpt-5-mini
+[2025-12-08 20:17:08.885][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:17:30.439][AI] AI meta chunk recv 2061 bytes
+[2025-12-08 20:17:30.448][AI] AI chunk 0-40 classified 40
+[2025-12-08 20:17:30.467][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:18:01.073][AI] AI meta chunk recv 2004 bytes
+[2025-12-08 20:18:01.075][AI] AI chunk 40-80 classified 40
+[2025-12-08 20:18:01.087][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:18:24.684][AI] AI meta chunk recv 2035 bytes
+[2025-12-08 20:18:24.686][AI] AI chunk 80-120 classified 40
+[2025-12-08 20:18:24.698][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:18:35.903][AI] AI meta chunk recv 2041 bytes
+[2025-12-08 20:18:35.905][AI] AI chunk 120-160 classified 40
+[2025-12-08 20:18:35.919][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:18:56.986][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 20:18:56.988][AI] AI chunk 160-200 classified 40
+[2025-12-08 20:18:56.998][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:19:23.076][AI] AI meta chunk recv 2055 bytes
+[2025-12-08 20:19:23.078][AI] AI chunk 200-240 classified 40
+[2025-12-08 20:19:23.088][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:19:49.801][AI] AI meta chunk recv 2055 bytes
+[2025-12-08 20:19:49.803][AI] AI chunk 240-280 classified 40
+[2025-12-08 20:19:49.818][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:20:01.519][AI] AI meta chunk recv 2044 bytes
+[2025-12-08 20:20:01.521][AI] AI chunk 280-320 classified 40
+[2025-12-08 20:20:01.532][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:20:27.527][AI] AI meta chunk recv 2052 bytes
+[2025-12-08 20:20:27.532][AI] AI chunk 320-360 classified 40
+[2025-12-08 20:20:27.546][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:20:45.265][AI] AI meta chunk recv 2041 bytes
+[2025-12-08 20:20:45.269][AI] AI chunk 360-400 classified 40
+[2025-12-08 20:20:45.282][AI] AI meta chunk send (11 items, model gpt-5-mini)
+[2025-12-08 20:20:47.840][AI] AI meta chunk recv 1141 bytes
+[2025-12-08 20:20:47.842][AI] AI chunk 400-411 classified 11
+[2025-12-08 20:20:47.850][AI] AI chunk 0-40 sending with model gpt-5-mini
+[2025-12-08 20:21:10.460][AI] AI chunk 0-40 response 1203 bytes
+[2025-12-08 20:21:10.480][AI] AI chunk 40-80 sending with model gpt-5-mini
+[2025-12-08 20:21:33.268][AI] AI chunk 40-80 response 1161 bytes
+[2025-12-08 20:21:33.270][AI] AI chunk 80-120 sending with model gpt-5-mini
+[2025-12-08 20:21:48.459][AI] AI chunk 80-120 response 1385 bytes
+[2025-12-08 20:21:48.463][AI] AI chunk 120-160 sending with model gpt-5-mini
+[2025-12-08 20:21:58.310][AI] AI chunk 120-160 response 1729 bytes
+[2025-12-08 20:21:58.313][AI] AI chunk 160-200 sending with model gpt-5-mini
+[2025-12-08 20:22:09.297][AI] AI chunk 160-200 response 1420 bytes
+[2025-12-08 20:22:09.299][AI] AI chunk 200-240 sending with model gpt-5-mini
+[2025-12-08 20:22:39.026][AI] AI chunk 200-240 response 1444 bytes
+[2025-12-08 20:22:39.028][AI] AI chunk 240-280 sending with model gpt-5-mini
+[2025-12-08 20:23:02.547][AI] AI chunk 240-280 response 1516 bytes
+[2025-12-08 20:23:02.550][AI] AI chunk 280-320 sending with model gpt-5-mini
+[2025-12-08 20:23:22.546][AI] AI chunk 280-320 response 1705 bytes
+[2025-12-08 20:23:22.548][AI] AI chunk 320-360 sending with model gpt-5-mini
+[2025-12-08 20:23:50.180][AI] AI chunk 320-360 response 1516 bytes
+[2025-12-08 20:23:50.181][AI] AI chunk 360-400 sending with model gpt-5-mini
+[2025-12-08 20:24:08.407][AI] AI chunk 360-400 response 1396 bytes
+[2025-12-08 20:24:08.409][AI] AI chunk 400-411 sending with model gpt-5-mini
+[2025-12-08 20:24:18.046][AI] AI chunk 400-411 response 1054 bytes
+[2025-12-08 20:24:18.048][AI] AI paragraph levels collected: 285 of 411
+[2025-12-08 20:24:18.062][AI] AI paragraph types: 411
+[2025-12-08 20:24:18.073][AI] AI paragraph levels: 285
+[2025-12-08 20:24:18.094][DOCX] Copied original DOCX to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx
+[2025-12-08 20:24:18.101][PATCH] Building numbering targets from analysis...
+[2025-12-08 20:24:18.103][PATCH] AI types available: 411, AI levels available: 285
+[2025-12-08 20:24:18.105][PATCH] AI-guided body start at paragraph 30: I have served as the Chair of the 8 Artillery Row 
+[2025-12-08 20:24:18.107][PATCH] Body starts at paragraph index 30
+[2025-12-08 20:24:18.110][PATCH] Number para 30 level 0: I have served as the Chair of the 8 Artillery Row Residents 
+[2025-12-08 20:24:18.113][PATCH] Number para 31 level 0: The facts and matter set out in this statement are within my
+[2025-12-08 20:24:18.116][PATCH] Skip para 34 - AI type: header - WITNESS STATEMENT OF KEVIN HASTINGS
+[2025-12-08 20:24:18.118][PATCH] Skip para 35 - AI type: intro - I, Kevin Hastings of 21 Corbet Close, Wa
+[2025-12-08 20:24:18.121][PATCH] Number para 36 level 0: I have served as the Chair of the 8 Artillery Row Residents 
+[2025-12-08 20:24:18.131][PATCH] Number para 37 level 0: The facts and matter set out in this statement are within my
+[2025-12-08 20:24:18.133][PATCH] Skip para 38 - AI type: heading - A. INTRODUCTION AND CAPACITY
+[2025-12-08 20:24:18.135][PATCH] Number para 39 level 0: I lived at 8 Artillery Row with my family from April 2016 un
+[2025-12-08 20:24:18.137][PATCH] Number para 40 level 0: I make this statement on behalf of the Applicants. The facts
+[2025-12-08 20:24:18.139][PATCH] Number para 41 level 0: This statement supports the Applicants’ challenge to the ser
+[2025-12-08 20:24:18.142][PATCH] Number para 42 level 0: The statement is intended to be read alongside the Applicant
+[2025-12-08 20:24:18.144][PATCH] Number para 45 level 0: Period of overcharge/double charge
+[2025-12-08 20:24:18.146][PATCH] Number para 47 level 0: Heat and Hot water
+[2025-12-08 20:24:18.147][PATCH] Number para 50 level 0: £10,000 (or whatever the figure is)
+[2025-12-08 20:24:18.149][PATCH] Number para 52 level 0: Double charging of communal supply
+[2025-12-08 20:24:18.150][PATCH] Number para 54 level 0: £1.3m
+[2025-12-08 20:24:18.152][PATCH] Number para 60 level 0: AES Systems plant or Heat Interface Maintenance
+[2025-12-08 20:24:18.154][PATCH] Number para 67 level 0: The Respondent and its solicitors have suggested that they r
+[2025-12-08 20:24:18.156][PATCH] Number para 68 level 0: In reality, most of the documents now produced for this refe
+[2025-12-08 20:24:18.158][PATCH] Number para 69 level 0: What is genuinely new in this claim is very limited: a parti
+[2025-12-08 20:24:18.160][PATCH] Built 281 numbering targets. Sample: [30:0] [31:0] [36:0] [37:0] [39:0] [40:0] [41:0] [42:0] [45:0] [47:0]
+[2025-12-08 20:24:18.162][PATCH] Patcher will apply numbering to 281 paragraphs
+[2025-12-08 20:24:18.164][PATCH] Patcher: start for Draft Witness Statement of KH 2025.12.07_UKLegal.docx with 281 targets
+[2025-12-08 20:24:18.185][PATCH] Patcher: unzip ok to /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/tmp/wordformat-patch-2836F167-D83D-41B6-B476-076EDBEB8547
+[2025-12-08 20:24:18.185][PATCH] Patcher: numbering.xml exists, finding safe numId
+[2025-12-08 20:24:18.187][PATCH] Patcher: max existing numId/abstractNumId = 19
+[2025-12-08 20:24:18.189][PATCH] Patcher: appended numbering definition with numId=119
+[2025-12-08 20:24:18.191][PATCH] Patcher: using numId=119 for our numbering
+[2025-12-08 20:24:18.193][PATCH] Patcher: index-based injection into document.xml with numId=119
+[2025-12-08 20:24:18.195][PATCH] Patcher: 281 paragraphs to number (index map), 281 with prefixes
+[2025-12-08 20:24:18.549][PATCH] Patcher: found 411 paragraphs (all)
+[2025-12-08 20:24:18.550][PATCH] Patcher: numbering para 30 level 0: I have served as the Chair of the 8 Artillery Row 
+[2025-12-08 20:24:18.555][PATCH] Patcher: numbering para 31 level 0: The facts and matter set out in this statement are
+[2025-12-08 20:24:18.559][PATCH] Patcher: para 36 already has numPr, skipping
+[2025-12-08 20:24:18.591][PATCH] Patcher: numbering para 37 level 0: The facts and matter set out in this statement are
+[2025-12-08 20:24:18.604][PATCH] Patcher: para 39 already has numPr, skipping
+[2025-12-08 20:24:18.610][PATCH] Patcher: para 40 already has numPr, skipping
+[2025-12-08 20:24:18.612][PATCH] Patcher: para 41 already has numPr, skipping
+[2025-12-08 20:24:18.614][PATCH] Patcher: para 42 already has numPr, skipping
+[2025-12-08 20:24:18.616][PATCH] Patcher: numbering para 45 level 0: Period of overcharge/double charge
+[2025-12-08 20:24:18.619][PATCH] Patcher: numbering para 47 level 0: Heat and Hot water
+[2025-12-08 20:24:18.621][PATCH] Patcher: para 67 already has numPr, skipping
+[2025-12-08 20:24:18.623][PATCH] Patcher: para 68 already has numPr, skipping
+[2025-12-08 20:24:18.626][PATCH] Patcher: para 69 already has numPr, skipping
+[2025-12-08 20:24:18.627][PATCH] Patcher: para 70 already has numPr, skipping
+[2025-12-08 20:24:18.630][PATCH] Patcher: para 71 already has numPr, skipping
+[2025-12-08 20:24:18.632][PATCH] Patcher: para 72 already has numPr, skipping
+[2025-12-08 20:24:18.634][PATCH] Patcher: para 73 already has numPr, skipping
+[2025-12-08 20:24:18.637][PATCH] Patcher: para 74 already has numPr, skipping
+[2025-12-08 20:24:18.639][PATCH] Patcher: para 75 already has numPr, skipping
+[2025-12-08 20:24:18.641][PATCH] Patcher: para 76 already has numPr, skipping
+[2025-12-08 20:24:18.643][PATCH] Patcher: para 77 already has numPr, skipping
+[2025-12-08 20:24:18.645][PATCH] Patcher: para 78 already has numPr, skipping
+[2025-12-08 20:24:18.647][PATCH] Patcher: para 79 already has numPr, skipping
+[2025-12-08 20:24:18.652][PATCH] Patcher: para 82 already has numPr, skipping
+[2025-12-08 20:24:18.654][PATCH] Patcher: para 83 already has numPr, skipping
+[2025-12-08 20:24:18.656][PATCH] Patcher: para 86 already has numPr, skipping
+[2025-12-08 20:24:18.658][PATCH] Patcher: para 89 already has numPr, skipping
+[2025-12-08 20:24:18.660][PATCH] Patcher: para 90 already has numPr, skipping
+[2025-12-08 20:24:18.662][PATCH] Patcher: para 92 already has numPr, skipping
+[2025-12-08 20:24:18.664][PATCH] Patcher: para 94 already has numPr, skipping
+[2025-12-08 20:24:18.665][PATCH] Patcher: para 96 already has numPr, skipping
+[2025-12-08 20:24:18.667][PATCH] Patcher: para 98 already has numPr, skipping
+[2025-12-08 20:24:18.670][PATCH] Patcher: para 100 already has numPr, skipping
+[2025-12-08 20:24:18.672][PATCH] Patcher: para 102 already has numPr, skipping
+[2025-12-08 20:24:18.674][PATCH] Patcher: para 106 already has numPr, skipping
+[2025-12-08 20:24:18.676][PATCH] Patcher: para 107 already has numPr, skipping
+[2025-12-08 20:24:18.677][PATCH] Patcher: para 108 already has numPr, skipping
+[2025-12-08 20:24:18.679][PATCH] Patcher: para 109 already has numPr, skipping
+[2025-12-08 20:24:18.681][PATCH] Patcher: para 110 already has numPr, skipping
+[2025-12-08 20:24:18.683][PATCH] Patcher: para 111 already has numPr, skipping
+[2025-12-08 20:24:18.684][PATCH] Patcher: para 112 already has numPr, skipping
+[2025-12-08 20:24:18.686][PATCH] Patcher: para 113 already has numPr, skipping
+[2025-12-08 20:24:18.687][PATCH] Patcher: para 116 already has numPr, skipping
+[2025-12-08 20:24:18.689][PATCH] Patcher: para 117 already has numPr, skipping
+[2025-12-08 20:24:18.691][PATCH] Patcher: para 118 already has numPr, skipping
+[2025-12-08 20:24:18.692][PATCH] Patcher: para 119 already has numPr, skipping
+[2025-12-08 20:24:18.693][PATCH] Patcher: para 120 already has numPr, skipping
+[2025-12-08 20:24:18.695][PATCH] Patcher: para 121 already has numPr, skipping
+[2025-12-08 20:24:18.696][PATCH] Patcher: para 122 already has numPr, skipping
+[2025-12-08 20:24:18.698][PATCH] Patcher: para 123 already has numPr, skipping
+[2025-12-08 20:24:18.700][PATCH] Patcher: para 124 already has numPr, skipping
+[2025-12-08 20:24:18.701][PATCH] Patcher: para 125 already has numPr, skipping
+[2025-12-08 20:24:18.703][PATCH] Patcher: para 126 already has numPr, skipping
+[2025-12-08 20:24:18.704][PATCH] Patcher: para 127 already has numPr, skipping
+[2025-12-08 20:24:18.705][PATCH] Patcher: para 128 already has numPr, skipping
+[2025-12-08 20:24:18.707][PATCH] Patcher: para 129 already has numPr, skipping
+[2025-12-08 20:24:18.708][PATCH] Patcher: para 130 already has numPr, skipping
+[2025-12-08 20:24:18.709][PATCH] Patcher: para 131 already has numPr, skipping
+[2025-12-08 20:24:18.711][PATCH] Patcher: para 132 already has numPr, skipping
+[2025-12-08 20:24:18.719][PATCH] Patcher: para 133 already has numPr, skipping
+[2025-12-08 20:24:18.720][PATCH] Patcher: para 134 already has numPr, skipping
+[2025-12-08 20:24:18.721][PATCH] Patcher: para 135 already has numPr, skipping
+[2025-12-08 20:24:18.723][PATCH] Patcher: para 136 already has numPr, skipping
+[2025-12-08 20:24:18.724][PATCH] Patcher: para 137 already has numPr, skipping
+[2025-12-08 20:24:18.726][PATCH] Patcher: para 138 already has numPr, skipping
+[2025-12-08 20:24:18.727][PATCH] Patcher: para 139 already has numPr, skipping
+[2025-12-08 20:24:18.729][PATCH] Patcher: para 140 already has numPr, skipping
+[2025-12-08 20:24:18.730][PATCH] Patcher: para 141 already has numPr, skipping
+[2025-12-08 20:24:18.732][PATCH] Patcher: para 142 already has numPr, skipping
+[2025-12-08 20:24:18.736][PATCH] Patcher: para 143 already has numPr, skipping
+[2025-12-08 20:24:18.737][PATCH] Patcher: para 144 already has numPr, skipping
+[2025-12-08 20:24:18.739][PATCH] Patcher: para 145 already has numPr, skipping
+[2025-12-08 20:24:18.740][PATCH] Patcher: para 146 already has numPr, skipping
+[2025-12-08 20:24:18.742][PATCH] Patcher: para 147 already has numPr, skipping
+[2025-12-08 20:24:18.747][PATCH] Patcher: para 148 already has numPr, skipping
+[2025-12-08 20:24:18.749][PATCH] Patcher: para 149 already has numPr, skipping
+[2025-12-08 20:24:18.750][PATCH] Patcher: para 150 already has numPr, skipping
+[2025-12-08 20:24:18.752][PATCH] Patcher: para 151 already has numPr, skipping
+[2025-12-08 20:24:18.753][PATCH] Patcher: para 152 already has numPr, skipping
+[2025-12-08 20:24:18.754][PATCH] Patcher: para 153 already has numPr, skipping
+[2025-12-08 20:24:18.756][PATCH] Patcher: para 154 already has numPr, skipping
+[2025-12-08 20:24:18.757][PATCH] Patcher: para 155 already has numPr, skipping
+[2025-12-08 20:24:18.759][PATCH] Patcher: para 156 already has numPr, skipping
+[2025-12-08 20:24:18.760][PATCH] Patcher: para 157 already has numPr, skipping
+[2025-12-08 20:24:18.762][PATCH] Patcher: para 158 already has numPr, skipping
+[2025-12-08 20:24:18.763][PATCH] Patcher: para 162 already has numPr, skipping
+[2025-12-08 20:24:18.765][PATCH] Patcher: para 165 already has numPr, skipping
+[2025-12-08 20:24:18.766][PATCH] Patcher: para 167 already has numPr, skipping
+[2025-12-08 20:24:18.768][PATCH] Patcher: para 169 already has numPr, skipping
+[2025-12-08 20:24:18.769][PATCH] Patcher: para 170 already has numPr, skipping
+[2025-12-08 20:24:18.771][PATCH] Patcher: para 171 already has numPr, skipping
+[2025-12-08 20:24:18.772][PATCH] Patcher: para 172 already has numPr, skipping
+[2025-12-08 20:24:18.774][PATCH] Patcher: para 173 already has numPr, skipping
+[2025-12-08 20:24:18.775][PATCH] Patcher: para 174 already has numPr, skipping
+[2025-12-08 20:24:18.777][PATCH] Patcher: para 175 already has numPr, skipping
+[2025-12-08 20:24:18.778][PATCH] Patcher: para 179 already has numPr, skipping
+[2025-12-08 20:24:18.780][PATCH] Patcher: para 180 already has numPr, skipping
+[2025-12-08 20:24:18.781][PATCH] Patcher: para 181 already has numPr, skipping
+[2025-12-08 20:24:18.782][PATCH] Patcher: para 182 already has numPr, skipping
+[2025-12-08 20:24:18.784][PATCH] Patcher: para 183 already has numPr, skipping
+[2025-12-08 20:24:18.785][PATCH] Patcher: para 187 already has numPr, skipping
+[2025-12-08 20:24:18.786][PATCH] Patcher: para 188 already has numPr, skipping
+[2025-12-08 20:24:18.788][PATCH] Patcher: para 189 already has numPr, skipping
+[2025-12-08 20:24:18.789][PATCH] Patcher: para 192 already has numPr, skipping
+[2025-12-08 20:24:18.790][PATCH] Patcher: para 193 already has numPr, skipping
+[2025-12-08 20:24:18.791][PATCH] Patcher: para 194 already has numPr, skipping
+[2025-12-08 20:24:18.793][PATCH] Patcher: para 195 already has numPr, skipping
+[2025-12-08 20:24:18.794][PATCH] Patcher: para 196 already has numPr, skipping
+[2025-12-08 20:24:18.796][PATCH] Patcher: para 197 already has numPr, skipping
+[2025-12-08 20:24:18.797][PATCH] Patcher: para 200 already has numPr, skipping
+[2025-12-08 20:24:18.799][PATCH] Patcher: para 201 already has numPr, skipping
+[2025-12-08 20:24:18.801][PATCH] Patcher: para 202 already has numPr, skipping
+[2025-12-08 20:24:18.802][PATCH] Patcher: para 203 already has numPr, skipping
+[2025-12-08 20:24:18.803][PATCH] Patcher: para 204 already has numPr, skipping
+[2025-12-08 20:24:18.805][PATCH] Patcher: para 208 already has numPr, skipping
+[2025-12-08 20:24:18.806][PATCH] Patcher: para 209 already has numPr, skipping
+[2025-12-08 20:24:18.808][PATCH] Patcher: para 210 already has numPr, skipping
+[2025-12-08 20:24:18.809][PATCH] Patcher: para 211 already has numPr, skipping
+[2025-12-08 20:24:18.811][PATCH] Patcher: para 212 already has numPr, skipping
+[2025-12-08 20:24:18.812][PATCH] Patcher: para 213 already has numPr, skipping
+[2025-12-08 20:24:18.814][PATCH] Patcher: para 214 already has numPr, skipping
+[2025-12-08 20:24:18.815][PATCH] Patcher: para 215 already has numPr, skipping
+[2025-12-08 20:24:18.816][PATCH] Patcher: para 216 already has numPr, skipping
+[2025-12-08 20:24:18.817][PATCH] Patcher: para 217 already has numPr, skipping
+[2025-12-08 20:24:18.818][PATCH] Patcher: para 218 already has numPr, skipping
+[2025-12-08 20:24:18.820][PATCH] Patcher: para 219 already has numPr, skipping
+[2025-12-08 20:24:18.821][PATCH] Patcher: para 220 already has numPr, skipping
+[2025-12-08 20:24:18.823][PATCH] Patcher: para 221 already has numPr, skipping
+[2025-12-08 20:24:18.824][PATCH] Patcher: para 226 already has numPr, skipping
+[2025-12-08 20:24:18.825][PATCH] Patcher: para 227 already has numPr, skipping
+[2025-12-08 20:24:18.827][PATCH] Patcher: para 228 already has numPr, skipping
+[2025-12-08 20:24:18.828][PATCH] Patcher: para 229 already has numPr, skipping
+[2025-12-08 20:24:18.830][PATCH] Patcher: para 233 already has numPr, skipping
+[2025-12-08 20:24:18.831][PATCH] Patcher: para 234 already has numPr, skipping
+[2025-12-08 20:24:18.833][PATCH] Patcher: para 235 already has numPr, skipping
+[2025-12-08 20:24:18.839][PATCH] Patcher: para 239 already has numPr, skipping
+[2025-12-08 20:24:18.842][PATCH] Patcher: para 240 already has numPr, skipping
+[2025-12-08 20:24:18.843][PATCH] Patcher: para 241 already has numPr, skipping
+[2025-12-08 20:24:18.845][PATCH] Patcher: para 245 already has numPr, skipping
+[2025-12-08 20:24:18.847][PATCH] Patcher: para 246 already has numPr, skipping
+[2025-12-08 20:24:18.852][PATCH] Patcher: para 247 already has numPr, skipping
+[2025-12-08 20:24:18.853][PATCH] Patcher: para 251 already has numPr, skipping
+[2025-12-08 20:24:18.855][PATCH] Patcher: para 252 already has numPr, skipping
+[2025-12-08 20:24:18.856][PATCH] Patcher: para 253 already has numPr, skipping
+[2025-12-08 20:24:18.858][PATCH] Patcher: para 254 already has numPr, skipping
+[2025-12-08 20:24:18.860][PATCH] Patcher: para 255 already has numPr, skipping
+[2025-12-08 20:24:18.861][PATCH] Patcher: para 256 already has numPr, skipping
+[2025-12-08 20:24:18.862][PATCH] Patcher: para 257 already has numPr, skipping
+[2025-12-08 20:24:18.866][PATCH] Patcher: para 258 already has numPr, skipping
+[2025-12-08 20:24:18.867][PATCH] Patcher: para 259 already has numPr, skipping
+[2025-12-08 20:24:18.871][PATCH] Patcher: para 260 already has numPr, skipping
+[2025-12-08 20:24:18.872][PATCH] Patcher: para 261 already has numPr, skipping
+[2025-12-08 20:24:18.874][PATCH] Patcher: para 264 already has numPr, skipping
+[2025-12-08 20:24:18.876][PATCH] Patcher: para 265 already has numPr, skipping
+[2025-12-08 20:24:18.877][PATCH] Patcher: para 266 already has numPr, skipping
+[2025-12-08 20:24:18.879][PATCH] Patcher: para 267 already has numPr, skipping
+[2025-12-08 20:24:18.880][PATCH] Patcher: para 268 already has numPr, skipping
+[2025-12-08 20:24:18.881][PATCH] Patcher: para 269 already has numPr, skipping
+[2025-12-08 20:24:18.883][PATCH] Patcher: numbering para 273 level 0: No documentary evidence has been produced to show 
+[2025-12-08 20:24:18.884][PATCH] Patcher: para 274 already has numPr, skipping
+[2025-12-08 20:24:18.886][PATCH] Patcher: para 275 already has numPr, skipping
+[2025-12-08 20:24:18.887][PATCH] Patcher: para 276 already has numPr, skipping
+[2025-12-08 20:24:18.893][PATCH] Patcher: para 277 already has numPr, skipping
+[2025-12-08 20:24:18.894][PATCH] Patcher: para 280 already has numPr, skipping
+[2025-12-08 20:24:18.896][PATCH] Patcher: para 281 already has numPr, skipping
+[2025-12-08 20:24:18.898][PATCH] Patcher: para 282 already has numPr, skipping
+[2025-12-08 20:24:18.899][PATCH] Patcher: para 283 already has numPr, skipping
+[2025-12-08 20:24:18.901][PATCH] Patcher: para 284 already has numPr, skipping
+[2025-12-08 20:24:18.902][PATCH] Patcher: para 285 already has numPr, skipping
+[2025-12-08 20:24:18.903][PATCH] Patcher: para 286 already has numPr, skipping
+[2025-12-08 20:24:18.910][PATCH] Patcher: para 287 already has numPr, skipping
+[2025-12-08 20:24:18.911][PATCH] Patcher: para 288 already has numPr, skipping
+[2025-12-08 20:24:18.914][PATCH] Patcher: para 289 already has numPr, skipping
+[2025-12-08 20:24:18.915][PATCH] Patcher: para 290 already has numPr, skipping
+[2025-12-08 20:24:18.918][PATCH] Patcher: para 291 already has numPr, skipping
+[2025-12-08 20:24:18.919][PATCH] Patcher: para 292 already has numPr, skipping
+[2025-12-08 20:24:18.921][PATCH] Patcher: para 293 already has numPr, skipping
+[2025-12-08 20:24:18.922][PATCH] Patcher: para 294 already has numPr, skipping
+[2025-12-08 20:24:18.924][PATCH] Patcher: para 295 already has numPr, skipping
+[2025-12-08 20:24:18.925][PATCH] Patcher: para 296 already has numPr, skipping
+[2025-12-08 20:24:18.927][PATCH] Patcher: para 297 already has numPr, skipping
+[2025-12-08 20:24:18.928][PATCH] Patcher: para 298 already has numPr, skipping
+[2025-12-08 20:24:18.930][PATCH] Patcher: para 299 already has numPr, skipping
+[2025-12-08 20:24:18.931][PATCH] Patcher: para 300 already has numPr, skipping
+[2025-12-08 20:24:18.933][PATCH] Patcher: para 301 already has numPr, skipping
+[2025-12-08 20:24:18.935][PATCH] Patcher: para 302 already has numPr, skipping
+[2025-12-08 20:24:18.936][PATCH] Patcher: para 303 already has numPr, skipping
+[2025-12-08 20:24:18.940][PATCH] Patcher: para 304 already has numPr, skipping
+[2025-12-08 20:24:18.942][PATCH] Patcher: para 305 already has numPr, skipping
+[2025-12-08 20:24:18.943][PATCH] Patcher: para 306 already has numPr, skipping
+[2025-12-08 20:24:18.945][PATCH] Patcher: para 308 already has numPr, skipping
+[2025-12-08 20:24:18.946][PATCH] Patcher: para 309 already has numPr, skipping
+[2025-12-08 20:24:18.948][PATCH] Patcher: para 310 already has numPr, skipping
+[2025-12-08 20:24:18.949][PATCH] Patcher: para 311 already has numPr, skipping
+[2025-12-08 20:24:18.955][PATCH] Patcher: para 312 already has numPr, skipping
+[2025-12-08 20:24:18.956][PATCH] Patcher: para 313 already has numPr, skipping
+[2025-12-08 20:24:18.958][PATCH] Patcher: para 314 already has numPr, skipping
+[2025-12-08 20:24:18.961][PATCH] Patcher: para 315 already has numPr, skipping
+[2025-12-08 20:24:18.964][PATCH] Patcher: para 316 already has numPr, skipping
+[2025-12-08 20:24:18.966][PATCH] Patcher: para 317 already has numPr, skipping
+[2025-12-08 20:24:18.967][PATCH] Patcher: para 318 already has numPr, skipping
+[2025-12-08 20:24:18.968][PATCH] Patcher: para 319 already has numPr, skipping
+[2025-12-08 20:24:18.970][PATCH] Patcher: para 320 already has numPr, skipping
+[2025-12-08 20:24:18.971][PATCH] Patcher: para 321 already has numPr, skipping
+[2025-12-08 20:24:18.973][PATCH] Patcher: para 322 already has numPr, skipping
+[2025-12-08 20:24:18.979][PATCH] Patcher: para 323 already has numPr, skipping
+[2025-12-08 20:24:18.980][PATCH] Patcher: para 324 already has numPr, skipping
+[2025-12-08 20:24:18.982][PATCH] Patcher: para 325 already has numPr, skipping
+[2025-12-08 20:24:18.984][PATCH] Patcher: para 326 already has numPr, skipping
+[2025-12-08 20:24:18.985][PATCH] Patcher: para 327 already has numPr, skipping
+[2025-12-08 20:24:18.987][PATCH] Patcher: para 328 already has numPr, skipping
+[2025-12-08 20:24:18.988][PATCH] Patcher: para 329 already has numPr, skipping
+[2025-12-08 20:24:18.990][PATCH] Patcher: para 333 already has numPr, skipping
+[2025-12-08 20:24:18.992][PATCH] Patcher: para 334 already has numPr, skipping
+[2025-12-08 20:24:18.993][PATCH] Patcher: para 335 already has numPr, skipping
+[2025-12-08 20:24:18.995][PATCH] Patcher: para 336 already has numPr, skipping
+[2025-12-08 20:24:18.996][PATCH] Patcher: para 337 already has numPr, skipping
+[2025-12-08 20:24:18.998][PATCH] Patcher: para 339 already has numPr, skipping
+[2025-12-08 20:24:19.000][PATCH] Patcher: para 343 already has numPr, skipping
+[2025-12-08 20:24:19.005][PATCH] Patcher: para 344 already has numPr, skipping
+[2025-12-08 20:24:19.007][PATCH] Patcher: para 345 already has numPr, skipping
+[2025-12-08 20:24:19.008][PATCH] Patcher: para 346 already has numPr, skipping
+[2025-12-08 20:24:19.011][PATCH] Patcher: para 350 already has numPr, skipping
+[2025-12-08 20:24:19.013][PATCH] Patcher: para 351 already has numPr, skipping
+[2025-12-08 20:24:19.014][PATCH] Patcher: para 352 already has numPr, skipping
+[2025-12-08 20:24:19.018][PATCH] Patcher: para 353 already has numPr, skipping
+[2025-12-08 20:24:19.020][PATCH] Patcher: para 354 already has numPr, skipping
+[2025-12-08 20:24:19.021][PATCH] Patcher: para 355 already has numPr, skipping
+[2025-12-08 20:24:19.023][PATCH] Patcher: para 356 already has numPr, skipping
+[2025-12-08 20:24:19.024][PATCH] Patcher: para 357 already has numPr, skipping
+[2025-12-08 20:24:19.026][PATCH] Patcher: para 358 already has numPr, skipping
+[2025-12-08 20:24:19.027][PATCH] Patcher: para 359 already has numPr, skipping
+[2025-12-08 20:24:19.029][PATCH] Patcher: para 360 already has numPr, skipping
+[2025-12-08 20:24:19.034][PATCH] Patcher: para 364 already has numPr, skipping
+[2025-12-08 20:24:19.035][PATCH] Patcher: para 365 already has numPr, skipping
+[2025-12-08 20:24:19.037][PATCH] Patcher: para 366 already has numPr, skipping
+[2025-12-08 20:24:19.038][PATCH] Patcher: para 367 already has numPr, skipping
+[2025-12-08 20:24:19.040][PATCH] Patcher: para 371 already has numPr, skipping
+[2025-12-08 20:24:19.044][PATCH] Patcher: para 372 already has numPr, skipping
+[2025-12-08 20:24:19.045][PATCH] Patcher: para 376 already has numPr, skipping
+[2025-12-08 20:24:19.047][PATCH] Patcher: para 377 already has numPr, skipping
+[2025-12-08 20:24:19.048][PATCH] Patcher: para 378 already has numPr, skipping
+[2025-12-08 20:24:19.050][PATCH] Patcher: para 379 already has numPr, skipping
+[2025-12-08 20:24:19.051][PATCH] Patcher: para 380 already has numPr, skipping
+[2025-12-08 20:24:19.053][PATCH] Patcher: para 381 already has numPr, skipping
+[2025-12-08 20:24:19.054][PATCH] Patcher: para 385 already has numPr, skipping
+[2025-12-08 20:24:19.056][PATCH] Patcher: para 386 already has numPr, skipping
+[2025-12-08 20:24:19.057][PATCH] Patcher: para 387 already has numPr, skipping
+[2025-12-08 20:24:19.059][PATCH] Patcher: para 388 already has numPr, skipping
+[2025-12-08 20:24:19.061][PATCH] Patcher: para 389 already has numPr, skipping
+[2025-12-08 20:24:19.065][PATCH] Patcher: para 390 already has numPr, skipping
+[2025-12-08 20:24:19.067][PATCH] Patcher: para 391 already has numPr, skipping
+[2025-12-08 20:24:19.069][PATCH] Patcher: para 395 already has numPr, skipping
+[2025-12-08 20:24:19.070][PATCH] Patcher: para 396 already has numPr, skipping
+[2025-12-08 20:24:19.072][PATCH] Patcher: para 397 already has numPr, skipping
+[2025-12-08 20:24:19.073][PATCH] Patcher: para 398 already has numPr, skipping
+[2025-12-08 20:24:19.075][PATCH] Patcher: para 399 already has numPr, skipping
+[2025-12-08 20:24:19.077][PATCH] Patcher: para 400 already has numPr, skipping
+[2025-12-08 20:24:19.079][PATCH] Patcher: para 401 already has numPr, skipping
+[2025-12-08 20:24:19.082][PATCH] Patcher: para 402 already has numPr, skipping
+[2025-12-08 20:24:19.084][PATCH] Patcher: numbered 27 paragraphs by index
+[2025-12-08 20:24:19.086][PATCH] Patcher: inject complete
+[2025-12-08 20:24:19.087][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
+[2025-12-08 20:24:19.089][PATCH] Patcher: replaced original DOCX with patched version
+[2025-12-08 20:24:19.091][PATCH] Patcher completed successfully
+
+=== wordformat run 2025-12-08 19:35:54 +0000 ===
+
+[2025-12-08 20:35:54.147][UI] Selected file: /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07.docx
+[2025-12-08 20:35:54.182][DOCX] Loaded DOCX for analysis. Length 125049 chars
+[2025-12-08 20:35:54.187][LOG] Log file path: /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/Downloads/Developer/wordformat/logs/wordformat.log
+[2025-12-08 20:35:54.197][AI] AI style-aware: 411 non-empty paragraphs to classify
+[2025-12-08 20:35:54.207][AI] Total paragraphs (including empty): 411
+[2025-12-08 20:35:54.214][AI] Requesting model list…
+[2025-12-08 20:35:55.086][AI] Received AI response (13442 bytes)
+[2025-12-08 20:35:55.097][AI] Model list: ["gpt-4-0613", "gpt-4", "gpt-3.5-turbo", "gpt-5.1-codex-max", "gpt-5.1-2025-11-13", "gpt-5.1", "gpt-5.1-codex", "gpt-5.1-codex-mini", "davinci-002", "babbage-002", "gpt-3.5-turbo-instruct", "gpt-3.5-turbo-instruct-0914", "dall-e-3", "dall-e-2", "gpt-4-1106-preview", "gpt-3.5-turbo-1106", "tts-1-hd", "tts-1-1106", "tts-1-hd-1106", "text-embedding-3-small", "text-embedding-3-large", "gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-3.5-turbo-0125", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-mini-2024-07-18", "gpt-4o-mini", "gpt-4o-2024-08-06", "chatgpt-4o-latest", "gpt-4o-audio-preview", "gpt-4o-realtime-preview", "omni-moderation-latest", "omni-moderation-2024-09-26", "gpt-4o-realtime-preview-2024-12-17", "gpt-4o-audio-preview-2024-12-17", "gpt-4o-mini-realtime-preview-2024-12-17", "gpt-4o-mini-audio-preview-2024-12-17", "o1-2024-12-17", "o1", "gpt-4o-mini-realtime-preview", "gpt-4o-mini-audio-preview", "o3-mini", "o3-mini-2025-01-31", "gpt-4o-2024-11-20", "gpt-4o-search-preview-2025-03-11", "gpt-4o-search-preview", "gpt-4o-mini-search-preview-2025-03-11", "gpt-4o-mini-search-preview", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "o1-pro-2025-03-19", "o1-pro", "gpt-4o-mini-tts", "o3-2025-04-16", "o4-mini-2025-04-16", "o3", "o4-mini", "gpt-4.1-2025-04-14", "gpt-4.1", "gpt-4.1-mini-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano-2025-04-14", "gpt-4.1-nano", "gpt-image-1", "codex-mini-latest", "o3-pro", "gpt-4o-realtime-preview-2025-06-03", "gpt-4o-audio-preview-2025-06-03", "o3-pro-2025-06-10", "o4-mini-deep-research", "o3-deep-research", "gpt-4o-transcribe-diarize", "o3-deep-research-2025-06-26", "o4-mini-deep-research-2025-06-26", "gpt-5-chat-latest", "gpt-5-2025-08-07", "gpt-5", "gpt-5-mini-2025-08-07", "gpt-5-mini", "gpt-5-nano-2025-08-07", "gpt-5-nano", "gpt-audio-2025-08-28", "gpt-realtime", "gpt-realtime-2025-08-28", "gpt-audio", "gpt-5-codex", "gpt-image-1-mini", "gpt-5-pro-2025-10-06", "gpt-5-pro", "gpt-audio-mini", "gpt-audio-mini-2025-10-06", "gpt-5-search-api", "gpt-realtime-mini", "gpt-realtime-mini-2025-10-06", "sora-2", "sora-2-pro", "gpt-5-search-api-2025-10-14", "gpt-5.1-chat-latest", "gpt-3.5-turbo-16k", "tts-1", "whisper-1", "text-embedding-ada-002"]
+[2025-12-08 20:35:55.109][AI] Selected model: gpt-5-mini
+[2025-12-08 20:35:55.118][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:36:22.347][AI] AI meta chunk recv 2085 bytes
+[2025-12-08 20:36:22.355][AI] AI chunk 0-40 classified 40
+[2025-12-08 20:36:22.368][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:36:34.980][AI] AI meta chunk recv 2006 bytes
+[2025-12-08 20:36:34.981][AI] AI chunk 40-80 classified 40
+[2025-12-08 20:36:34.989][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:36:48.400][AI] AI meta chunk recv 2035 bytes
+[2025-12-08 20:36:48.402][AI] AI chunk 80-120 classified 40
+[2025-12-08 20:36:48.408][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:36:56.972][AI] AI meta chunk recv 2041 bytes
+[2025-12-08 20:36:56.974][AI] AI chunk 120-160 classified 40
+[2025-12-08 20:36:56.981][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:37:17.712][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 20:37:17.714][AI] AI chunk 160-200 classified 40
+[2025-12-08 20:37:17.731][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:37:28.996][AI] AI meta chunk recv 2054 bytes
+[2025-12-08 20:37:28.997][AI] AI chunk 200-240 classified 40
+[2025-12-08 20:37:29.007][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:37:52.959][AI] AI meta chunk recv 2055 bytes
+[2025-12-08 20:37:52.960][AI] AI chunk 240-280 classified 40
+[2025-12-08 20:37:52.971][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:38:07.105][AI] AI meta chunk recv 2045 bytes
+[2025-12-08 20:38:07.107][AI] AI chunk 280-320 classified 40
+[2025-12-08 20:38:07.114][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:38:24.199][AI] AI meta chunk recv 2052 bytes
+[2025-12-08 20:38:24.202][AI] AI chunk 320-360 classified 40
+[2025-12-08 20:38:24.210][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 20:38:37.745][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 20:38:37.747][AI] AI chunk 360-400 classified 40
+[2025-12-08 20:38:37.756][AI] AI meta chunk send (11 items, model gpt-5-mini)
+[2025-12-08 20:38:47.623][AI] AI meta chunk recv 1141 bytes
+[2025-12-08 20:38:47.626][AI] AI chunk 400-411 classified 11
+[2025-12-08 20:38:47.634][AI] AI chunk 0-40 sending with model gpt-5-mini
+[2025-12-08 20:39:02.093][AI] AI chunk 0-40 response 1203 bytes
+[2025-12-08 20:39:02.115][AI] AI chunk 40-80 sending with model gpt-5-mini
+[2025-12-08 20:39:21.615][AI] AI chunk 40-80 response 1368 bytes
+[2025-12-08 20:39:21.617][AI] AI chunk 80-120 sending with model gpt-5-mini
+[2025-12-08 20:39:44.935][AI] AI chunk 80-120 response 1385 bytes
+[2025-12-08 20:39:44.938][AI] AI chunk 120-160 sending with model gpt-5-mini
+[2025-12-08 20:40:05.193][AI] AI chunk 120-160 response 1732 bytes
+[2025-12-08 20:40:05.196][AI] AI chunk 160-200 sending with model gpt-5-mini
+[2025-12-08 20:40:24.486][AI] AI chunk 160-200 response 1444 bytes
+[2025-12-08 20:40:24.489][AI] AI chunk 200-240 sending with model gpt-5-mini
+[2025-12-08 20:40:41.278][AI] AI chunk 200-240 response 1444 bytes
+[2025-12-08 20:40:41.281][AI] AI chunk 240-280 sending with model gpt-5-mini
+[2025-12-08 20:41:04.206][AI] AI chunk 240-280 response 1516 bytes
+[2025-12-08 20:41:04.210][AI] AI chunk 280-320 sending with model gpt-5-mini
+[2025-12-08 20:41:30.352][AI] AI chunk 280-320 response 1732 bytes
+[2025-12-08 20:41:30.355][AI] AI chunk 320-360 sending with model gpt-5-mini
+[2025-12-08 20:41:51.242][AI] AI chunk 320-360 response 1516 bytes
+[2025-12-08 20:41:51.245][AI] AI chunk 360-400 sending with model gpt-5-mini
+[2025-12-08 20:42:19.631][AI] AI chunk 360-400 response 1396 bytes
+[2025-12-08 20:42:19.632][AI] AI chunk 400-411 sending with model gpt-5-mini
+[2025-12-08 20:42:34.833][AI] AI chunk 400-411 response 1055 bytes
+[2025-12-08 20:42:34.842][AI] AI paragraph levels collected: 296 of 411
+[2025-12-08 20:42:34.851][AI] AI paragraph types: 411
+[2025-12-08 20:42:34.874][AI] AI paragraph levels: 296
+[2025-12-08 20:42:34.891][DOCX] Copied original DOCX to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx
+[2025-12-08 20:42:34.923][PATCH] Patcher will apply numbering to 282 paragraphs
+[2025-12-08 20:42:34.923][PATCH] Patcher: start for Draft Witness Statement of KH 2025.12.07_UKLegal.docx with 282 targets
+[2025-12-08 20:42:35.012][PATCH] Patcher: unzip ok to /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/tmp/wordformat-patch-AD696434-046E-4193-AA83-8458F18B3CF6
+[2025-12-08 20:42:35.013][PATCH] Patcher: numbering.xml exists, finding safe numId
+[2025-12-08 20:42:35.293][PATCH] Patcher: max existing numId/abstractNumId = 19
+[2025-12-08 20:42:35.362][PATCH] Patcher: appended numbering definition with numId=119
+[2025-12-08 20:42:35.400][PATCH] Patcher: using numId=119 for our numbering
+[2025-12-08 20:42:35.428][PATCH] Patcher: index-based injection into document.xml with numId=119
+[2025-12-08 20:42:35.433][PATCH] Patcher: 282 paragraphs to number (index map), 282 with prefixes
+[2025-12-08 20:42:37.701][PATCH] Patcher: found 411 paragraphs (all)
+[2025-12-08 20:42:37.709][PATCH] Patcher: numbering para 30 level 0: I have served as the Chair of the 8 Artillery Row 
+[2025-12-08 20:42:37.723][PATCH] Patcher: para 36 already has numPr, skipping
+[2025-12-08 20:42:37.730][PATCH] Patcher: para 39 already has numPr, skipping
+[2025-12-08 20:42:37.743][PATCH] Patcher: para 41 already has numPr, skipping
+[2025-12-08 20:42:37.748][PATCH] Patcher: para 42 already has numPr, skipping
+[2025-12-08 20:42:37.752][PATCH] Patcher: numbering para 43 level 0: Category
+[2025-12-08 20:42:37.756][PATCH] Patcher: numbering para 44 level 0: Reason for reduction
+[2025-12-08 20:42:37.759][PATCH] Patcher: numbering para 45 level 0: Period of overcharge/double charge
+[2025-12-08 20:42:37.762][PATCH] Patcher: numbering para 46 level 0: Amount claimed
+[2025-12-08 20:42:37.765][PATCH] Patcher: para 67 already has numPr, skipping
+[2025-12-08 20:42:37.768][PATCH] Patcher: para 68 already has numPr, skipping
+[2025-12-08 20:42:37.772][PATCH] Patcher: para 69 already has numPr, skipping
+[2025-12-08 20:42:37.775][PATCH] Patcher: para 70 already has numPr, skipping
+[2025-12-08 20:42:37.777][PATCH] Patcher: para 71 already has numPr, skipping
+[2025-12-08 20:42:37.780][PATCH] Patcher: para 72 already has numPr, skipping
+[2025-12-08 20:42:37.786][PATCH] Patcher: para 73 already has numPr, skipping
+[2025-12-08 20:42:37.789][PATCH] Patcher: para 74 already has numPr, skipping
+[2025-12-08 20:42:37.791][PATCH] Patcher: para 75 already has numPr, skipping
+[2025-12-08 20:42:37.794][PATCH] Patcher: para 76 already has numPr, skipping
+[2025-12-08 20:42:37.796][PATCH] Patcher: para 77 already has numPr, skipping
+[2025-12-08 20:42:37.799][PATCH] Patcher: para 78 already has numPr, skipping
+[2025-12-08 20:42:37.805][PATCH] Patcher: para 79 already has numPr, skipping
+[2025-12-08 20:42:37.808][PATCH] Patcher: para 82 already has numPr, skipping
+[2025-12-08 20:42:37.810][PATCH] Patcher: para 83 already has numPr, skipping
+[2025-12-08 20:42:37.812][PATCH] Patcher: para 86 already has numPr, skipping
+[2025-12-08 20:42:37.814][PATCH] Patcher: para 89 already has numPr, skipping
+[2025-12-08 20:42:37.816][PATCH] Patcher: para 90 already has numPr, skipping
+[2025-12-08 20:42:37.818][PATCH] Patcher: para 92 already has numPr, skipping
+[2025-12-08 20:42:37.820][PATCH] Patcher: para 94 already has numPr, skipping
+[2025-12-08 20:42:37.823][PATCH] Patcher: para 96 already has numPr, skipping
+[2025-12-08 20:42:37.825][PATCH] Patcher: para 98 already has numPr, skipping
+[2025-12-08 20:42:37.828][PATCH] Patcher: para 100 already has numPr, skipping
+[2025-12-08 20:42:37.831][PATCH] Patcher: para 102 already has numPr, skipping
+[2025-12-08 20:42:37.833][PATCH] Patcher: para 106 already has numPr, skipping
+[2025-12-08 20:42:37.838][PATCH] Patcher: para 107 already has numPr, skipping
+[2025-12-08 20:42:37.840][PATCH] Patcher: para 108 already has numPr, skipping
+[2025-12-08 20:42:37.842][PATCH] Patcher: para 109 already has numPr, skipping
+[2025-12-08 20:42:37.849][PATCH] Patcher: para 110 already has numPr, skipping
+[2025-12-08 20:42:37.851][PATCH] Patcher: para 111 already has numPr, skipping
+[2025-12-08 20:42:37.854][PATCH] Patcher: para 112 already has numPr, skipping
+[2025-12-08 20:42:37.856][PATCH] Patcher: para 113 already has numPr, skipping
+[2025-12-08 20:42:37.858][PATCH] Patcher: para 116 already has numPr, skipping
+[2025-12-08 20:42:37.861][PATCH] Patcher: para 117 already has numPr, skipping
+[2025-12-08 20:42:37.863][PATCH] Patcher: para 118 already has numPr, skipping
+[2025-12-08 20:42:37.864][PATCH] Patcher: para 119 already has numPr, skipping
+[2025-12-08 20:42:37.867][PATCH] Patcher: para 120 already has numPr, skipping
+[2025-12-08 20:42:37.868][PATCH] Patcher: para 121 already has numPr, skipping
+[2025-12-08 20:42:37.870][PATCH] Patcher: para 122 already has numPr, skipping
+[2025-12-08 20:42:37.872][PATCH] Patcher: para 123 already has numPr, skipping
+[2025-12-08 20:42:37.873][PATCH] Patcher: para 124 already has numPr, skipping
+[2025-12-08 20:42:37.875][PATCH] Patcher: para 125 already has numPr, skipping
+[2025-12-08 20:42:37.876][PATCH] Patcher: para 126 already has numPr, skipping
+[2025-12-08 20:42:37.880][PATCH] Patcher: para 127 already has numPr, skipping
+[2025-12-08 20:42:37.882][PATCH] Patcher: para 128 already has numPr, skipping
+[2025-12-08 20:42:37.884][PATCH] Patcher: para 129 already has numPr, skipping
+[2025-12-08 20:42:37.885][PATCH] Patcher: para 130 already has numPr, skipping
+[2025-12-08 20:42:37.889][PATCH] Patcher: para 131 already has numPr, skipping
+[2025-12-08 20:42:37.891][PATCH] Patcher: para 132 already has numPr, skipping
+[2025-12-08 20:42:37.892][PATCH] Patcher: para 133 already has numPr, skipping
+[2025-12-08 20:42:37.894][PATCH] Patcher: para 134 already has numPr, skipping
+[2025-12-08 20:42:37.896][PATCH] Patcher: para 135 already has numPr, skipping
+[2025-12-08 20:42:37.897][PATCH] Patcher: para 136 already has numPr, skipping
+[2025-12-08 20:42:37.899][PATCH] Patcher: para 137 already has numPr, skipping
+[2025-12-08 20:42:37.901][PATCH] Patcher: para 138 already has numPr, skipping
+[2025-12-08 20:42:37.903][PATCH] Patcher: para 139 already has numPr, skipping
+[2025-12-08 20:42:37.906][PATCH] Patcher: para 140 already has numPr, skipping
+[2025-12-08 20:42:37.907][PATCH] Patcher: para 141 already has numPr, skipping
+[2025-12-08 20:42:37.908][PATCH] Patcher: para 142 already has numPr, skipping
+[2025-12-08 20:42:37.915][PATCH] Patcher: para 143 already has numPr, skipping
+[2025-12-08 20:42:37.916][PATCH] Patcher: para 144 already has numPr, skipping
+[2025-12-08 20:42:37.919][PATCH] Patcher: para 145 already has numPr, skipping
+[2025-12-08 20:42:37.921][PATCH] Patcher: para 146 already has numPr, skipping
+[2025-12-08 20:42:37.922][PATCH] Patcher: para 147 already has numPr, skipping
+[2025-12-08 20:42:37.924][PATCH] Patcher: para 148 already has numPr, skipping
+[2025-12-08 20:42:37.925][PATCH] Patcher: para 149 already has numPr, skipping
+[2025-12-08 20:42:37.927][PATCH] Patcher: para 150 already has numPr, skipping
+[2025-12-08 20:42:37.932][PATCH] Patcher: para 151 already has numPr, skipping
+[2025-12-08 20:42:37.933][PATCH] Patcher: para 152 already has numPr, skipping
+[2025-12-08 20:42:37.935][PATCH] Patcher: para 153 already has numPr, skipping
+[2025-12-08 20:42:37.936][PATCH] Patcher: para 154 already has numPr, skipping
+[2025-12-08 20:42:37.938][PATCH] Patcher: para 155 already has numPr, skipping
+[2025-12-08 20:42:37.940][PATCH] Patcher: para 156 already has numPr, skipping
+[2025-12-08 20:42:37.941][PATCH] Patcher: para 157 already has numPr, skipping
+[2025-12-08 20:42:37.942][PATCH] Patcher: para 158 already has numPr, skipping
+[2025-12-08 20:42:37.944][PATCH] Patcher: para 162 already has numPr, skipping
+[2025-12-08 20:42:37.945][PATCH] Patcher: para 165 already has numPr, skipping
+[2025-12-08 20:42:37.947][PATCH] Patcher: para 167 already has numPr, skipping
+[2025-12-08 20:42:37.948][PATCH] Patcher: para 169 already has numPr, skipping
+[2025-12-08 20:42:37.950][PATCH] Patcher: para 170 already has numPr, skipping
+[2025-12-08 20:42:37.951][PATCH] Patcher: para 171 already has numPr, skipping
+[2025-12-08 20:42:37.953][PATCH] Patcher: para 172 already has numPr, skipping
+[2025-12-08 20:42:37.956][PATCH] Patcher: para 173 already has numPr, skipping
+[2025-12-08 20:42:37.958][PATCH] Patcher: para 174 already has numPr, skipping
+[2025-12-08 20:42:37.961][PATCH] Patcher: para 175 already has numPr, skipping
+[2025-12-08 20:42:37.962][PATCH] Patcher: para 179 already has numPr, skipping
+[2025-12-08 20:42:37.964][PATCH] Patcher: para 180 already has numPr, skipping
+[2025-12-08 20:42:37.968][PATCH] Patcher: para 181 already has numPr, skipping
+[2025-12-08 20:42:37.969][PATCH] Patcher: para 182 already has numPr, skipping
+[2025-12-08 20:42:37.970][PATCH] Patcher: para 183 already has numPr, skipping
+[2025-12-08 20:42:37.972][PATCH] Patcher: para 187 already has numPr, skipping
+[2025-12-08 20:42:37.974][PATCH] Patcher: para 188 already has numPr, skipping
+[2025-12-08 20:42:37.975][PATCH] Patcher: para 189 already has numPr, skipping
+[2025-12-08 20:42:37.976][PATCH] Patcher: para 192 already has numPr, skipping
+[2025-12-08 20:42:37.978][PATCH] Patcher: para 193 already has numPr, skipping
+[2025-12-08 20:42:37.980][PATCH] Patcher: para 194 already has numPr, skipping
+[2025-12-08 20:42:37.984][PATCH] Patcher: para 195 already has numPr, skipping
+[2025-12-08 20:42:37.986][PATCH] Patcher: para 196 already has numPr, skipping
+[2025-12-08 20:42:37.987][PATCH] Patcher: para 197 already has numPr, skipping
+[2025-12-08 20:42:37.989][PATCH] Patcher: numbering para 198 level 1: (b) May 2023: the readings are consistent across t
+[2025-12-08 20:42:37.990][PATCH] Patcher: para 200 already has numPr, skipping
+[2025-12-08 20:42:37.992][PATCH] Patcher: para 201 already has numPr, skipping
+[2025-12-08 20:42:37.993][PATCH] Patcher: para 202 already has numPr, skipping
+[2025-12-08 20:42:37.996][PATCH] Patcher: para 203 already has numPr, skipping
+[2025-12-08 20:42:37.998][PATCH] Patcher: para 204 already has numPr, skipping
+[2025-12-08 20:42:37.999][PATCH] Patcher: para 208 already has numPr, skipping
+[2025-12-08 20:42:38.001][PATCH] Patcher: para 209 already has numPr, skipping
+[2025-12-08 20:42:38.002][PATCH] Patcher: para 210 already has numPr, skipping
+[2025-12-08 20:42:38.004][PATCH] Patcher: para 211 already has numPr, skipping
+[2025-12-08 20:42:38.005][PATCH] Patcher: para 212 already has numPr, skipping
+[2025-12-08 20:42:38.007][PATCH] Patcher: para 213 already has numPr, skipping
+[2025-12-08 20:42:38.008][PATCH] Patcher: para 214 already has numPr, skipping
+[2025-12-08 20:42:38.009][PATCH] Patcher: para 215 already has numPr, skipping
+[2025-12-08 20:42:38.016][PATCH] Patcher: para 216 already has numPr, skipping
+[2025-12-08 20:42:38.017][PATCH] Patcher: para 217 already has numPr, skipping
+[2025-12-08 20:42:38.018][PATCH] Patcher: para 218 already has numPr, skipping
+[2025-12-08 20:42:38.020][PATCH] Patcher: para 219 already has numPr, skipping
+[2025-12-08 20:42:38.021][PATCH] Patcher: para 220 already has numPr, skipping
+[2025-12-08 20:42:38.023][PATCH] Patcher: para 221 already has numPr, skipping
+[2025-12-08 20:42:38.024][PATCH] Patcher: para 226 already has numPr, skipping
+[2025-12-08 20:42:38.026][PATCH] Patcher: para 227 already has numPr, skipping
+[2025-12-08 20:42:38.028][PATCH] Patcher: para 228 already has numPr, skipping
+[2025-12-08 20:42:38.029][PATCH] Patcher: para 229 already has numPr, skipping
+[2025-12-08 20:42:38.031][PATCH] Patcher: para 233 already has numPr, skipping
+[2025-12-08 20:42:38.032][PATCH] Patcher: para 234 already has numPr, skipping
+[2025-12-08 20:42:38.034][PATCH] Patcher: para 235 already has numPr, skipping
+[2025-12-08 20:42:38.035][PATCH] Patcher: para 239 already has numPr, skipping
+[2025-12-08 20:42:38.037][PATCH] Patcher: para 240 already has numPr, skipping
+[2025-12-08 20:42:38.044][PATCH] Patcher: para 241 already has numPr, skipping
+[2025-12-08 20:42:38.047][PATCH] Patcher: para 245 already has numPr, skipping
+[2025-12-08 20:42:38.049][PATCH] Patcher: para 246 already has numPr, skipping
+[2025-12-08 20:42:38.051][PATCH] Patcher: para 247 already has numPr, skipping
+[2025-12-08 20:42:38.052][PATCH] Patcher: para 251 already has numPr, skipping
+[2025-12-08 20:42:38.054][PATCH] Patcher: para 252 already has numPr, skipping
+[2025-12-08 20:42:38.056][PATCH] Patcher: para 253 already has numPr, skipping
+[2025-12-08 20:42:38.057][PATCH] Patcher: para 254 already has numPr, skipping
+[2025-12-08 20:42:38.059][PATCH] Patcher: para 255 already has numPr, skipping
+[2025-12-08 20:42:38.064][PATCH] Patcher: para 256 already has numPr, skipping
+[2025-12-08 20:42:38.066][PATCH] Patcher: para 257 already has numPr, skipping
+[2025-12-08 20:42:38.067][PATCH] Patcher: para 258 already has numPr, skipping
+[2025-12-08 20:42:38.072][PATCH] Patcher: para 259 already has numPr, skipping
+[2025-12-08 20:42:38.073][PATCH] Patcher: para 260 already has numPr, skipping
+[2025-12-08 20:42:38.076][PATCH] Patcher: para 261 already has numPr, skipping
+[2025-12-08 20:42:38.077][PATCH] Patcher: para 264 already has numPr, skipping
+[2025-12-08 20:42:38.081][PATCH] Patcher: para 265 already has numPr, skipping
+[2025-12-08 20:42:38.083][PATCH] Patcher: para 266 already has numPr, skipping
+[2025-12-08 20:42:38.084][PATCH] Patcher: para 267 already has numPr, skipping
+[2025-12-08 20:42:38.086][PATCH] Patcher: para 268 already has numPr, skipping
+[2025-12-08 20:42:38.088][PATCH] Patcher: para 269 already has numPr, skipping
+[2025-12-08 20:42:38.090][PATCH] Patcher: para 274 already has numPr, skipping
+[2025-12-08 20:42:38.091][PATCH] Patcher: para 275 already has numPr, skipping
+[2025-12-08 20:42:38.093][PATCH] Patcher: para 276 already has numPr, skipping
+[2025-12-08 20:42:38.094][PATCH] Patcher: para 277 already has numPr, skipping
+[2025-12-08 20:42:38.096][PATCH] Patcher: para 280 already has numPr, skipping
+[2025-12-08 20:42:38.098][PATCH] Patcher: para 281 already has numPr, skipping
+[2025-12-08 20:42:38.100][PATCH] Patcher: para 282 already has numPr, skipping
+[2025-12-08 20:42:38.101][PATCH] Patcher: para 283 already has numPr, skipping
+[2025-12-08 20:42:38.103][PATCH] Patcher: para 284 already has numPr, skipping
+[2025-12-08 20:42:38.105][PATCH] Patcher: para 285 already has numPr, skipping
+[2025-12-08 20:42:38.106][PATCH] Patcher: para 286 already has numPr, skipping
+[2025-12-08 20:42:38.108][PATCH] Patcher: para 287 already has numPr, skipping
+[2025-12-08 20:42:38.110][PATCH] Patcher: para 288 already has numPr, skipping
+[2025-12-08 20:42:38.112][PATCH] Patcher: para 289 already has numPr, skipping
+[2025-12-08 20:42:38.113][PATCH] Patcher: para 290 already has numPr, skipping
+[2025-12-08 20:42:38.115][PATCH] Patcher: para 291 already has numPr, skipping
+[2025-12-08 20:42:38.118][PATCH] Patcher: para 292 already has numPr, skipping
+[2025-12-08 20:42:38.120][PATCH] Patcher: para 293 already has numPr, skipping
+[2025-12-08 20:42:38.121][PATCH] Patcher: para 294 already has numPr, skipping
+[2025-12-08 20:42:38.126][PATCH] Patcher: para 295 already has numPr, skipping
+[2025-12-08 20:42:38.128][PATCH] Patcher: para 296 already has numPr, skipping
+[2025-12-08 20:42:38.130][PATCH] Patcher: para 297 already has numPr, skipping
+[2025-12-08 20:42:38.133][PATCH] Patcher: para 298 already has numPr, skipping
+[2025-12-08 20:42:38.135][PATCH] Patcher: para 299 already has numPr, skipping
+[2025-12-08 20:42:38.138][PATCH] Patcher: para 300 already has numPr, skipping
+[2025-12-08 20:42:38.140][PATCH] Patcher: para 301 already has numPr, skipping
+[2025-12-08 20:42:38.142][PATCH] Patcher: para 302 already has numPr, skipping
+[2025-12-08 20:42:38.144][PATCH] Patcher: para 303 already has numPr, skipping
+[2025-12-08 20:42:38.146][PATCH] Patcher: para 304 already has numPr, skipping
+[2025-12-08 20:42:38.148][PATCH] Patcher: para 305 already has numPr, skipping
+[2025-12-08 20:42:38.149][PATCH] Patcher: para 306 already has numPr, skipping
+[2025-12-08 20:42:38.151][PATCH] Patcher: para 308 already has numPr, skipping
+[2025-12-08 20:42:38.153][PATCH] Patcher: para 309 already has numPr, skipping
+[2025-12-08 20:42:38.157][PATCH] Patcher: para 310 already has numPr, skipping
+[2025-12-08 20:42:38.159][PATCH] Patcher: para 311 already has numPr, skipping
+[2025-12-08 20:42:38.161][PATCH] Patcher: para 312 already has numPr, skipping
+[2025-12-08 20:42:38.163][PATCH] Patcher: para 313 already has numPr, skipping
+[2025-12-08 20:42:38.165][PATCH] Patcher: para 314 already has numPr, skipping
+[2025-12-08 20:42:38.166][PATCH] Patcher: para 315 already has numPr, skipping
+[2025-12-08 20:42:38.168][PATCH] Patcher: para 316 already has numPr, skipping
+[2025-12-08 20:42:38.170][PATCH] Patcher: para 317 already has numPr, skipping
+[2025-12-08 20:42:38.171][PATCH] Patcher: para 318 already has numPr, skipping
+[2025-12-08 20:42:38.174][PATCH] Patcher: para 319 already has numPr, skipping
+[2025-12-08 20:42:38.175][PATCH] Patcher: para 320 already has numPr, skipping
+[2025-12-08 20:42:38.177][PATCH] Patcher: para 321 already has numPr, skipping
+[2025-12-08 20:42:38.179][PATCH] Patcher: para 322 already has numPr, skipping
+[2025-12-08 20:42:38.182][PATCH] Patcher: para 323 already has numPr, skipping
+[2025-12-08 20:42:38.183][PATCH] Patcher: para 324 already has numPr, skipping
+[2025-12-08 20:42:38.185][PATCH] Patcher: para 325 already has numPr, skipping
+[2025-12-08 20:42:38.186][PATCH] Patcher: para 326 already has numPr, skipping
+[2025-12-08 20:42:38.191][PATCH] Patcher: para 327 already has numPr, skipping
+[2025-12-08 20:42:38.193][PATCH] Patcher: para 328 already has numPr, skipping
+[2025-12-08 20:42:38.194][PATCH] Patcher: para 329 already has numPr, skipping
+[2025-12-08 20:42:38.197][PATCH] Patcher: para 333 already has numPr, skipping
+[2025-12-08 20:42:38.199][PATCH] Patcher: para 334 already has numPr, skipping
+[2025-12-08 20:42:38.201][PATCH] Patcher: para 335 already has numPr, skipping
+[2025-12-08 20:42:38.203][PATCH] Patcher: para 336 already has numPr, skipping
+[2025-12-08 20:42:38.205][PATCH] Patcher: para 337 already has numPr, skipping
+[2025-12-08 20:42:38.206][PATCH] Patcher: para 339 already has numPr, skipping
+[2025-12-08 20:42:38.208][PATCH] Patcher: para 343 already has numPr, skipping
+[2025-12-08 20:42:38.209][PATCH] Patcher: para 344 already has numPr, skipping
+[2025-12-08 20:42:38.211][PATCH] Patcher: para 345 already has numPr, skipping
+[2025-12-08 20:42:38.213][PATCH] Patcher: para 346 already has numPr, skipping
+[2025-12-08 20:42:38.214][PATCH] Patcher: para 350 already has numPr, skipping
+[2025-12-08 20:42:38.216][PATCH] Patcher: para 351 already has numPr, skipping
+[2025-12-08 20:42:38.218][PATCH] Patcher: para 352 already has numPr, skipping
+[2025-12-08 20:42:38.223][PATCH] Patcher: para 353 already has numPr, skipping
+[2025-12-08 20:42:38.225][PATCH] Patcher: para 354 already has numPr, skipping
+[2025-12-08 20:42:38.227][PATCH] Patcher: para 355 already has numPr, skipping
+[2025-12-08 20:42:38.230][PATCH] Patcher: para 356 already has numPr, skipping
+[2025-12-08 20:42:38.231][PATCH] Patcher: para 357 already has numPr, skipping
+[2025-12-08 20:42:38.233][PATCH] Patcher: para 358 already has numPr, skipping
+[2025-12-08 20:42:38.235][PATCH] Patcher: para 359 already has numPr, skipping
+[2025-12-08 20:42:38.237][PATCH] Patcher: para 360 already has numPr, skipping
+[2025-12-08 20:42:38.238][PATCH] Patcher: para 364 already has numPr, skipping
+[2025-12-08 20:42:38.240][PATCH] Patcher: para 365 already has numPr, skipping
+[2025-12-08 20:42:38.241][PATCH] Patcher: para 366 already has numPr, skipping
+[2025-12-08 20:42:38.243][PATCH] Patcher: para 367 already has numPr, skipping
+[2025-12-08 20:42:38.245][PATCH] Patcher: para 371 already has numPr, skipping
+[2025-12-08 20:42:38.246][PATCH] Patcher: para 372 already has numPr, skipping
+[2025-12-08 20:42:38.248][PATCH] Patcher: para 376 already has numPr, skipping
+[2025-12-08 20:42:38.250][PATCH] Patcher: para 377 already has numPr, skipping
+[2025-12-08 20:42:38.251][PATCH] Patcher: para 378 already has numPr, skipping
+[2025-12-08 20:42:38.253][PATCH] Patcher: para 379 already has numPr, skipping
+[2025-12-08 20:42:38.254][PATCH] Patcher: para 380 already has numPr, skipping
+[2025-12-08 20:42:38.256][PATCH] Patcher: para 381 already has numPr, skipping
+[2025-12-08 20:42:38.257][PATCH] Patcher: para 385 already has numPr, skipping
+[2025-12-08 20:42:38.258][PATCH] Patcher: para 386 already has numPr, skipping
+[2025-12-08 20:42:38.260][PATCH] Patcher: para 387 already has numPr, skipping
+[2025-12-08 20:42:38.266][PATCH] Patcher: para 388 already has numPr, skipping
+[2025-12-08 20:42:38.268][PATCH] Patcher: para 389 already has numPr, skipping
+[2025-12-08 20:42:38.269][PATCH] Patcher: para 390 already has numPr, skipping
+[2025-12-08 20:42:38.271][PATCH] Patcher: para 391 already has numPr, skipping
+[2025-12-08 20:42:38.272][PATCH] Patcher: para 395 already has numPr, skipping
+[2025-12-08 20:42:38.274][PATCH] Patcher: para 396 already has numPr, skipping
+[2025-12-08 20:42:38.275][PATCH] Patcher: para 397 already has numPr, skipping
+[2025-12-08 20:42:38.276][PATCH] Patcher: para 398 already has numPr, skipping
+[2025-12-08 20:42:38.278][PATCH] Patcher: para 399 already has numPr, skipping
+[2025-12-08 20:42:38.279][PATCH] Patcher: para 400 already has numPr, skipping
+[2025-12-08 20:42:38.281][PATCH] Patcher: para 401 already has numPr, skipping
+[2025-12-08 20:42:38.282][PATCH] Patcher: para 402 already has numPr, skipping
+[2025-12-08 20:42:38.283][PATCH] Patcher: para 404 already has numPr, skipping
+[2025-12-08 20:42:38.285][PATCH] Patcher: numbered 28 paragraphs by index
+[2025-12-08 20:42:38.286][PATCH] Patcher: inject complete
+[2025-12-08 20:42:38.288][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
+[2025-12-08 20:42:38.290][PATCH] Patcher: replaced original DOCX with patched version
+[2025-12-08 20:42:38.291][PATCH] Patcher completed successfully

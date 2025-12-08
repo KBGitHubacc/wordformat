@@ -107,3 +107,156 @@
 [2025-12-08 17:55:52.630][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
 [2025-12-08 17:55:52.630][PATCH] Patcher: replaced original DOCX with patched version
 [2025-12-08 17:55:52.696][PATCH] Patcher completed successfully
+
+=== wordformat run 2025-12-08 17:26:32 +0000 ===
+
+[2025-12-08 18:26:32.216][UI] Selected file: /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07.docx
+[2025-12-08 18:26:32.236][DOCX] Loaded DOCX. Length 125049 chars
+[2025-12-08 18:26:32.242][LOG] Log file path: /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/Downloads/Developer/wordformat/logs/wordformat.log
+[2025-12-08 18:26:32.253][AI] AI style-aware: 343 non-empty paragraphs to classify
+[2025-12-08 18:26:32.261][AI] Total paragraphs (including empty): 411
+[2025-12-08 18:26:32.276][AI] Requesting model list…
+[2025-12-08 18:26:32.879][AI] Received AI response (13442 bytes)
+[2025-12-08 18:26:32.888][AI] Model list: ["gpt-4-0613", "gpt-4", "gpt-3.5-turbo", "gpt-5.1-codex-max", "gpt-5.1-2025-11-13", "gpt-5.1", "gpt-5.1-codex", "gpt-5.1-codex-mini", "davinci-002", "babbage-002", "gpt-3.5-turbo-instruct", "gpt-3.5-turbo-instruct-0914", "dall-e-3", "dall-e-2", "gpt-4-1106-preview", "gpt-3.5-turbo-1106", "tts-1-hd", "tts-1-1106", "tts-1-hd-1106", "text-embedding-3-small", "text-embedding-3-large", "gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-3.5-turbo-0125", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-mini-2024-07-18", "gpt-4o-mini", "gpt-4o-2024-08-06", "chatgpt-4o-latest", "gpt-4o-audio-preview", "gpt-4o-realtime-preview", "omni-moderation-latest", "omni-moderation-2024-09-26", "gpt-4o-realtime-preview-2024-12-17", "gpt-4o-audio-preview-2024-12-17", "gpt-4o-mini-realtime-preview-2024-12-17", "gpt-4o-mini-audio-preview-2024-12-17", "o1-2024-12-17", "o1", "gpt-4o-mini-realtime-preview", "gpt-4o-mini-audio-preview", "o3-mini", "o3-mini-2025-01-31", "gpt-4o-2024-11-20", "gpt-4o-search-preview-2025-03-11", "gpt-4o-search-preview", "gpt-4o-mini-search-preview-2025-03-11", "gpt-4o-mini-search-preview", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "o1-pro-2025-03-19", "o1-pro", "gpt-4o-mini-tts", "o3-2025-04-16", "o4-mini-2025-04-16", "o3", "o4-mini", "gpt-4.1-2025-04-14", "gpt-4.1", "gpt-4.1-mini-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano-2025-04-14", "gpt-4.1-nano", "gpt-image-1", "codex-mini-latest", "o3-pro", "gpt-4o-realtime-preview-2025-06-03", "gpt-4o-audio-preview-2025-06-03", "o3-pro-2025-06-10", "o4-mini-deep-research", "o3-deep-research", "gpt-4o-transcribe-diarize", "o3-deep-research-2025-06-26", "o4-mini-deep-research-2025-06-26", "gpt-5-chat-latest", "gpt-5-2025-08-07", "gpt-5", "gpt-5-mini-2025-08-07", "gpt-5-mini", "gpt-5-nano-2025-08-07", "gpt-5-nano", "gpt-audio-2025-08-28", "gpt-realtime", "gpt-realtime-2025-08-28", "gpt-audio", "gpt-5-codex", "gpt-image-1-mini", "gpt-5-pro-2025-10-06", "gpt-5-pro", "gpt-audio-mini", "gpt-audio-mini-2025-10-06", "gpt-5-search-api", "gpt-realtime-mini", "gpt-realtime-mini-2025-10-06", "sora-2", "sora-2-pro", "gpt-5-search-api-2025-10-14", "gpt-5.1-chat-latest", "gpt-3.5-turbo-16k", "tts-1", "whisper-1", "text-embedding-ada-002"]
+[2025-12-08 18:26:32.895][AI] Selected model: gpt-5-mini
+[2025-12-08 18:26:32.903][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:27:12.010][AI] AI meta chunk recv 2056 bytes
+[2025-12-08 18:27:12.019][AI] AI chunk 0-40 classified 40
+[2025-12-08 18:27:12.030][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:27:38.523][AI] AI meta chunk recv 2013 bytes
+[2025-12-08 18:27:38.525][AI] AI chunk 40-80 classified 40
+[2025-12-08 18:27:38.535][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:27:57.330][AI] AI meta chunk recv 2048 bytes
+[2025-12-08 18:27:57.332][AI] AI chunk 80-120 classified 40
+[2025-12-08 18:27:57.341][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:28:23.272][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 18:28:23.273][AI] AI chunk 120-160 classified 40
+[2025-12-08 18:28:23.285][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:28:45.071][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 18:28:45.074][AI] AI chunk 160-200 classified 40
+[2025-12-08 18:28:45.084][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:29:10.505][AI] AI meta chunk recv 2055 bytes
+[2025-12-08 18:29:10.507][AI] AI chunk 200-240 classified 40
+[2025-12-08 18:29:10.517][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:29:27.618][AI] AI meta chunk recv 2044 bytes
+[2025-12-08 18:29:27.620][AI] AI chunk 240-280 classified 40
+[2025-12-08 18:29:27.628][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 18:29:52.304][AI] AI meta chunk recv 2060 bytes
+[2025-12-08 18:29:52.306][AI] AI chunk 280-320 classified 40
+[2025-12-08 18:29:52.316][AI] AI meta chunk send (23 items, model gpt-5-mini)
+[2025-12-08 18:30:19.671][AI] AI meta chunk recv 1522 bytes
+[2025-12-08 18:30:19.673][AI] AI chunk 320-343 classified 23
+[2025-12-08 18:30:19.683][AI] AI chunk 0-40 sending with model gpt-5-mini
+[2025-12-08 18:30:45.983][AI] AI chunk 0-40 response 1203 bytes
+[2025-12-08 18:30:45.993][AI] AI chunk 40-80 sending with model gpt-5-mini
+[2025-12-08 18:31:12.963][AI] AI chunk 40-80 response 1161 bytes
+[2025-12-08 18:31:12.965][AI] AI chunk 80-120 sending with model gpt-5-mini
+[2025-12-08 18:31:37.161][AI] AI chunk 80-120 response 1382 bytes
+[2025-12-08 18:31:37.163][AI] AI chunk 120-160 sending with model gpt-5-mini
+[2025-12-08 18:32:02.927][AI] AI chunk 120-160 response 1729 bytes
+[2025-12-08 18:32:02.930][AI] AI chunk 160-200 sending with model gpt-5-mini
+[2025-12-08 18:32:27.055][AI] AI chunk 160-200 response 1441 bytes
+[2025-12-08 18:32:27.060][AI] AI chunk 200-240 sending with model gpt-5-mini
+[2025-12-08 18:32:45.339][AI] AI chunk 200-240 response 1441 bytes
+[2025-12-08 18:32:45.341][AI] AI chunk 240-280 sending with model gpt-5-mini
+[2025-12-08 18:33:20.940][AI] AI chunk 240-280 response 1513 bytes
+[2025-12-08 18:33:20.942][AI] AI chunk 280-320 sending with model gpt-5-mini
+[2025-12-08 18:33:57.027][AI] AI chunk 280-320 response 1705 bytes
+[2025-12-08 18:33:57.030][AI] AI chunk 320-360 sending with model gpt-5-mini
+[2025-12-08 18:34:29.138][AI] AI chunk 320-360 response 1561 bytes
+[2025-12-08 18:34:29.140][AI] AI chunk 360-400 sending with model gpt-5-mini
+[2025-12-08 18:34:52.088][AI] AI chunk 360-400 response 1393 bytes
+[2025-12-08 18:34:52.090][AI] AI chunk 400-411 sending with model gpt-5-mini
+[2025-12-08 18:35:00.752][AI] AI chunk 400-411 response 1054 bytes
+[2025-12-08 18:35:00.754][AI] AI paragraph levels collected: 288 of 411
+[2025-12-08 18:35:00.766][AI] AI paragraph types: 343
+[2025-12-08 18:35:00.772][AI] AI paragraph levels: 288
+[2025-12-08 18:35:00.783][FORMAT] Applying formatting…
+[2025-12-08 18:35:00.785][FORMAT] Formatting start. Total length: 125049
+[2025-12-08 18:35:00.788][FORMAT] AI-guided split: first body/heading at para 30, type body
+[2025-12-08 18:35:00.795][FORMAT] Split index at char 973, para 30
+[2025-12-08 18:35:00.797][FORMAT] Header length: 973, body length: 124076
+[2025-12-08 18:35:00.799][FORMAT] Body paragraphs (approx): 382, starting at global index 30
+[2025-12-08 18:35:00.801][FORMAT] Para level 1 type:body heading:false intro:false title:false text: I have served as the Chair of the 8 Artillery Row Residents Association since its inception until pr
+[2025-12-08 18:35:00.804][FORMAT] Para level 1 type:body heading:false intro:false title:false text: The facts and matter set out in this statement are within my own knowledge unless otherwise stated, 
+[2025-12-08 18:35:00.806][FORMAT] Para level 0 type:title heading:false intro:false title:true text: WITNESS STATEMENT OF KEVIN HASTINGS
+[2025-12-08 18:35:00.808][FORMAT] Para level 0 type:intro heading:false intro:true title:false text: I, Kevin Hastings of 21 Corbet Close, Wallington SM6 7GB will say as follows:
+[2025-12-08 18:35:00.809][FORMAT] Para level 1 type:body heading:false intro:false title:false text: I have served as the Chair of the 8 Artillery Row Residents Association since its inception until pr
+[2025-12-08 18:35:00.814][FORMAT] Para level 1 type:body heading:false intro:false title:false text: The facts and matter set out in this statement are within my own knowledge unless otherwise stated, 
+[2025-12-08 18:35:00.816][FORMAT] Para level 0 type:heading heading:true intro:false title:false text: A. INTRODUCTION AND CAPACITY
+[2025-12-08 18:35:00.818][FORMAT] Para level 1 type:body heading:false intro:false title:false text: I lived at 8 Artillery Row with my family from April 2016 until May 2024. I helped to set up, and ha
+[2025-12-08 18:35:00.820][FORMAT] Para level 1 type:body heading:false intro:false title:false text: I make this statement on behalf of the Applicants. The facts and matters set out are within my own k
+[2025-12-08 18:35:00.824][FORMAT] Para level 1 type:body heading:false intro:false title:false text: This statement supports the Applicants’ challenge to the service charges demanded for the years 2017
+[2025-12-08 18:35:00.826][FORMAT] Para level 1 type:body heading:false intro:false title:false text: The statement is intended to be read alongside the Applicants’ Scott Schedule (filed on 2 September 
+[2025-12-08 18:35:00.828][FORMAT] Para level 0 type:heading heading:true intro:false title:false text: Category
+[2025-12-08 18:35:00.830][FORMAT] Para level 1 type:body heading:false intro:false title:false text: Reason for reduction
+[2025-12-08 18:35:00.832][FORMAT] Para level 1 type:body heading:false intro:false title:false text: Period of overcharge/double charge
+[2025-12-08 18:35:00.833][FORMAT] Para level 1 type:body heading:false intro:false title:false text: Amount claimed
+[2025-12-08 18:35:00.835][FORMAT] Para level 1 type:body heading:false intro:false title:false text: Heat and Hot water
+[2025-12-08 18:35:00.837][FORMAT] Para level 1 type:body heading:false intro:false title:false text: Duplicated maintenance/admin costs
+[2025-12-08 18:35:00.839][FORMAT] Para level 1 type:body heading:false intro:false title:false text: 2017 to date
+[2025-12-08 18:35:00.841][FORMAT] Para level 1 type:body heading:false intro:false title:false text: £10,000 (or whatever the figure is)
+[2025-12-08 18:35:00.843][FORMAT] Para level 1 type:body heading:false intro:false title:false text: Electricity charges
+[2025-12-08 18:35:00.849][FORMAT] Para level 1 type:body heading:false intro:false title:false text: Double charging of communal supply
+[2025-12-08 18:35:00.850][FORMAT] Para level 1 type:body heading:false intro:false title:false text: 2015 to date
+[2025-12-08 18:35:00.852][FORMAT] Para level 1 type:body heading:false intro:false title:false text: £1.3m
+[2025-12-08 18:35:00.854][FORMAT] Para level 1 type:body heading:false intro:false title:false text: AES Systems plant or Heat Interface Maintenance
+[2025-12-08 18:35:00.860][FORMAT] Para level 0 type:heading heading:true intro:false title:false text: B. DISCLOSURE CONDUCT AND CASE MANAGEMENT
+[2025-12-08 18:35:00.862][FORMAT] Level counts -> level0:31 level1:264 level2:20 level3:0
+[2025-12-08 18:35:00.864][DOCX] Saved formatted DOCX to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx
+[2025-12-08 18:35:00.866][FORMAT] AI-guided split: first body/heading at para 30, type body
+[2025-12-08 18:35:00.868][PATCH] Target builder using splitCharIndex 973
+[2025-12-08 18:35:00.870][PATCH] Skipping para 34 - AI type: title
+[2025-12-08 18:35:00.872][PATCH] Skipping para 36 - heuristic: heading=false intro=false title=true truth=false
+[2025-12-08 18:35:00.874][PATCH] Skipping para 38 - AI type: heading
+[2025-12-08 18:35:00.875][PATCH] Skipping para 44 - heuristic: heading=true intro=false title=false truth=false
+[2025-12-08 18:35:00.877][PATCH] Skipping para 54 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.879][PATCH] Skipping para 66 - AI type: heading
+[2025-12-08 18:35:00.881][PATCH] Skipping para 80 - heuristic: heading=true intro=false title=false truth=false
+[2025-12-08 18:35:00.883][PATCH] Skipping para 88 - AI type: heading
+[2025-12-08 18:35:00.889][PATCH] Skipping para 108 - heuristic: heading=true intro=false title=false truth=false
+[2025-12-08 18:35:00.891][PATCH] Skipping para 120 - heuristic: heading=true intro=false title=false truth=false
+[2025-12-08 18:35:00.892][PATCH] Skipping para 138 - heuristic: heading=true intro=false title=false truth=false
+[2025-12-08 18:35:00.894][PATCH] Skipping para 156 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.896][PATCH] Skipping para 164 - AI type: heading
+[2025-12-08 18:35:00.901][PATCH] Skipping para 168 - AI type: heading
+[2025-12-08 18:35:00.903][PATCH] Skipping para 198 - AI type: quote
+[2025-12-08 18:35:00.906][PATCH] Skipping para 206 - AI type: heading
+[2025-12-08 18:35:00.907][PATCH] Skipping para 252 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.909][PATCH] Skipping para 258 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.911][PATCH] Skipping para 274 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.914][PATCH] Skipping para 278 - AI type: heading
+[2025-12-08 18:35:00.915][PATCH] Skipping para 286 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.917][PATCH] Skipping para 294 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.919][PATCH] Skipping para 322 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.922][PATCH] Skipping para 338 - AI type: heading
+[2025-12-08 18:35:00.923][PATCH] Skipping para 348 - AI type: heading
+[2025-12-08 18:35:00.925][PATCH] Skipping para 352 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.927][PATCH] Skipping para 362 - AI type: heading
+[2025-12-08 18:35:00.930][PATCH] Skipping para 370 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.931][PATCH] Skipping para 374 - AI type: heading
+[2025-12-08 18:35:00.933][PATCH] Skipping para 378 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.935][PATCH] Skipping para 386 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.936][PATCH] Skipping para 410 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.939][PATCH] Skipping para 440 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.941][PATCH] Skipping para 496 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.943][PATCH] Skipping para 558 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.944][PATCH] Skipping para 562 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.949][PATCH] Skipping para 572 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.952][PATCH] Skipping para 596 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.954][PATCH] Skipping para 606 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.956][PATCH] Skipping para 612 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.957][PATCH] Skipping para 626 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.959][PATCH] Skipping para 642 - no textLists and low indent (0.0)
+[2025-12-08 18:35:00.960][PATCH] Built 273 numbering targets. Sample: [32:0] [40:0] [42:0] [46:0] [48:0] [50:0] [52:0] [56:0] [58:0] [60:0]
+[2025-12-08 18:35:00.962][PATCH] Patcher will apply numbering to 273 paragraphs
+[2025-12-08 18:35:00.963][PATCH] Patcher: start for Draft Witness Statement of KH 2025.12.07_UKLegal.docx with 273 targets
+[2025-12-08 18:35:00.965][PATCH] Patcher: unzip ok to /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/tmp/wordformat-patch-41911B3F-6EFB-4FDE-8CC6-07A19274590B
+[2025-12-08 18:35:00.967][PATCH] Patcher: numbering.xml missing, creating…
+[2025-12-08 18:35:00.969][PATCH] Patcher: added rel for numbering.xml
+[2025-12-08 18:35:00.972][PATCH] Patcher: added content-type override for numbering.xml
+[2025-12-08 18:35:00.974][PATCH] Patcher: injecting numbering into document.xml
+[2025-12-08 18:35:00.975][PATCH] Patcher: inject complete
+[2025-12-08 18:35:00.984][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
+[2025-12-08 18:35:00.984][PATCH] Patcher: replaced original DOCX with patched version
+[2025-12-08 18:35:01.053][PATCH] Patcher completed successfully

@@ -8,12 +8,23 @@
 import Foundation
 import AppKit
 
-// MARK: - Defaults
+// MARK: - Configuration
 
 enum LegalFormattingDefaults {
     static let fontFamily = "Times New Roman"
     static let fontSize: CGFloat = 12.0
-    static let bodySpacing: CGFloat = 12.0
+    
+    // Spacing
+    static let paragraphSpacing: CGFloat = 12.0
+    static let lineHeight: CGFloat = 1.0
+    
+    // List Indentation (Points)
+    // 36pts = 0.5 inches (Standard Word Indent)
+    static let level1TextIndent: CGFloat = 36.0
+    static let level1NumberIndent: CGFloat = 0.0
+    
+    static let level2TextIndent: CGFloat = 72.0
+    static let level2NumberIndent: CGFloat = 36.0
 }
 
 // MARK: - Main Entry Point
@@ -25,16 +36,17 @@ func applyUKLegalFormatting(
 ) {
     guard document.length > 0 else { return }
     
-    // 1. Analyse Structure (Identify Header, Body, Titles)
+    // 1. Analyse Structure
+    // We scan the document to classify headers, body, quotes, etc.
     let structure = detectDocumentStructure(in: document)
     
-    // 2. Reconstruct the Document
-    // Instead of patching the existing string, we build a new one.
-    // This allows us to use HTML for lists (which guarantees dynamic numbering in Word)
-    // and standard TextKit attributes for headers.
-    let newDocument = reconstructDocument(from: document, structure: structure, metadata: header)
+    // 2. Re-Build Document
+    // We create a fresh NSMutableAttributedString to ensure clean attributes.
+    // We stitch it together paragraph by paragraph.
+    let newDocument = rebuildDocument(from: document, structure: structure, metadata: header)
     
-    // 3. Apply Global Font Normalisation (Safety pass)
+    // 3. Global Font Polish
+    // Ensure the font is consistent (Times New Roman 12)
     let fullRange = NSRange(location: 0, length: newDocument.length)
     applyBaseFont(to: newDocument, range: fullRange)
     
@@ -42,9 +54,9 @@ func applyUKLegalFormatting(
     document.setAttributedString(newDocument)
 }
 
-// MARK: - Reconstruction Engine
+// MARK: - Document Reconstruction Engine
 
-private func reconstructDocument(
+private func rebuildDocument(
     from original: NSAttributedString,
     structure: [AnalysisResult.FormattedRange],
     metadata: LegalHeaderMetadata
@@ -52,199 +64,225 @@ private func reconstructDocument(
     
     let output = NSMutableAttributedString()
     
-    // -- Step A: Insert/Process Header --
-    // Check if we detected an existing header
-    let hasExistingHeader = structure.first?.type == .headerMetadata
-    
-    if !hasExistingHeader && !metadata.caseReference.isEmpty {
-        // Generate new header if missing
+    // -- Step A: Header --
+    let hasHeader = structure.first?.type == .headerMetadata
+    if !hasHeader && !metadata.caseReference.isEmpty {
         output.append(generateLegalHeader(metadata))
     }
     
-    // -- Step B: Process Blocks --
-    // We group consecutive 'body' paragraphs together to form a single HTML list.
-    // Other types (headers, titles) are appended directly.
+    // -- Step B: Create Persistent List Objects --
+    // Crucial: Reusing these objects ensures the numbering is continuous (1, 2, 3...)
+    // If we created a new NSTextList for every paragraph, they would all be "1."
+    let rootList = NSTextList(markerFormat: .decimal, options: 0) // 1, 2, 3
+    rootList.startingItemNumber = 1
     
-    var bodyBuffer: [String] = []
+    // We maintain a map of sublists if needed, but a single generic sublist usually suffices for simple legal docs
+    let subList = NSTextList(markerFormat: .lowercaseAlpha, options: 0) // a, b, c
     
+    // -- Step C: Process Paragraphs --
     for item in structure {
-        let text = (original.string as NSString).substring(with: item.range).trimmingCharacters(in: .whitespacesAndNewlines)
-        if text.isEmpty { continue }
+        let originalRange = item.range
+        let originalText = (original.string as NSString).substring(with: originalRange)
         
-        if item.type == .body {
-            // Buffer body paragraphs to convert to HTML list later
-            bodyBuffer.append(text)
-        } else {
-            // 1. Flush any buffered body paragraphs first
-            if !bodyBuffer.isEmpty {
-                if let listAttr = createDynamicListFromText(bodyBuffer) {
-                    output.append(listAttr)
-                }
-                bodyBuffer.removeAll()
+        // Skip empty paragraphs to keep list tight, unless they are spacers
+        let cleanText = originalText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleanText.isEmpty {
+            // Optional: Insert a spacer if it's not a list item
+            if item.type != .body {
+                output.append(NSAttributedString(string: "\n"))
+            }
+            continue
+        }
+        
+        let paragraphContent = NSMutableAttributedString(string: cleanText)
+        
+        switch item.type {
+        case .headerMetadata:
+            applyHeaderStyle(to: paragraphContent)
+            output.append(paragraphContent)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .documentTitle:
+            applyTitleStyle(to: paragraphContent)
+            output.append(paragraphContent)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .intro:
+            applyBodyStyle(to: paragraphContent)
+            output.append(paragraphContent)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .heading:
+            applyHeadingStyle(to: paragraphContent)
+            output.append(paragraphContent)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .body:
+            // LIST LOGIC
+            // 1. Detect Level
+            let isSub = isSubPoint(cleanText)
+            
+            // 2. Strip existing manual numbers (e.g. "1.", "(a)")
+            let strippedText = stripManualNumbering(cleanText)
+            
+            // 3. Create the list item text
+            // Ideally, we prepend a TAB. This helps text engines align the text to the tab stop.
+            let itemString = NSMutableAttributedString(string: strippedText) // No manual number here!
+            
+            // 4. Create Paragraph Style for List
+            let style = NSMutableParagraphStyle()
+            style.paragraphSpacing = LegalFormattingDefaults.paragraphSpacing
+            style.alignment = .justified
+            
+            if isSub {
+                // LEVEL 2
+                style.headIndent = LegalFormattingDefaults.level2TextIndent
+                style.firstLineHeadIndent = LegalFormattingDefaults.level2NumberIndent
+                
+                // Important: Apply BOTH lists to indicate nesting
+                style.textLists = [rootList, subList]
+                
+                // Add tab stops to match indent
+                style.tabStops = [
+                    NSTextTab(textAlignment: .left, location: LegalFormattingDefaults.level2TextIndent, options: [:])
+                ]
+            } else {
+                // LEVEL 1
+                style.headIndent = LegalFormattingDefaults.level1TextIndent
+                style.firstLineHeadIndent = LegalFormattingDefaults.level1NumberIndent
+                
+                // Apply Root List
+                style.textLists = [rootList]
+                
+                // Add tab stops
+                style.tabStops = [
+                    NSTextTab(textAlignment: .left, location: LegalFormattingDefaults.level1TextIndent, options: [:])
+                ]
             }
             
-            // 2. Process this non-body item (Title, Intro, Signature, etc.)
-            let itemAttr = NSMutableAttributedString(string: text + "\n")
-            applyStyle(to: itemAttr, type: item.type)
-            output.append(itemAttr)
-        }
-    }
-    
-    // Flush any remaining body paragraphs at the end
-    if !bodyBuffer.isEmpty {
-        if let listAttr = createDynamicListFromText(bodyBuffer) {
-            output.append(listAttr)
+            // 5. Apply Attributes
+            let range = NSRange(location: 0, length: itemString.length)
+            itemString.addAttribute(.paragraphStyle, value: style, range: range)
+            
+            // 6. Append to Document
+            output.append(itemString)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .quote:
+            applyQuoteStyle(to: paragraphContent)
+            output.append(paragraphContent)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .statementOfTruth:
+            applyBodyStyle(to: paragraphContent)
+            boldEverything(in: paragraphContent)
+            output.append(paragraphContent)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .signature:
+            applyBodyStyle(to: paragraphContent)
+            output.append(paragraphContent)
+            output.append(NSAttributedString(string: "\n"))
+            
+        case .unknown:
+            break
         }
     }
     
     return output
 }
 
-// MARK: - HTML List Generator (The "Brand New" Approach)
+// MARK: - Style Applicators
 
-/// Converts an array of text strings into an NSAttributedString using HTML <ol> tags.
-/// This forces the system to generate the correct NSTextList attributes that Word recognises.
-private func createDynamicListFromText(_ paragraphs: [String]) -> NSAttributedString? {
-    // 1. Clean the text (Strip existing manual numbers like "1.", "304.")
-    let pattern = "^\\s*(\\d+|[a-zA-Z])+[.)]\\s+" // Matches "1.", "a)", "304."
-    
-    var listItemsHTML = ""
-    
-    for rawLine in paragraphs {
-        // Remove old numbering so we don't get "1. 304. Text"
-        let cleanLine = rawLine.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
-        
-        // Detect nesting based on patterns (simple heuristic)
-        // If the original line started with (a) or a., we ideally want a nested list.
-        // For robustness in this version, we will stick to a single clean numeric list
-        // as mixing levels in flat HTML string construction can be complex.
-        // Word allows users to indent 'level 2' easily if the list object exists.
-        
-        listItemsHTML += "<li>\(cleanLine)</li>"
-    }
-    
-    // 2. Build HTML Wrapper with CSS for Times New Roman
-    let htmlString = """
-    <html>
-    <head>
-    <style>
-        body {
-            font-family: 'Times New Roman';
-            font-size: 12pt;
-        }
-        ol {
-            margin-left: 0px;
-            padding-left: 36px; /* Hanging indent simulation */
-        }
-        li {
-            text-align: justify;
-            margin-bottom: 12pt;
-        }
-    </style>
-    </head>
-    <body>
-        <ol>
-            \(listItemsHTML)
-        </ol>
-    </body>
-    </html>
-    """
-    
-    // 3. Convert HTML to NSAttributedString
-    guard let data = htmlString.data(using: .utf8) else { return nil }
-    
-    do {
-        let attrString = try NSMutableAttributedString(
-            data: data,
-            options: [
-                .documentType: NSAttributedString.DocumentType.html,
-                .characterEncoding: String.Encoding.utf8.rawValue
-            ],
-            documentAttributes: nil
-        )
-        // HTML import often adds a trailing newline, trim it if needed
-        return attrString
-    } catch {
-        print("HTML conversion failed: \(error)")
-        return nil
-    }
-}
-
-// MARK: - Standard Styling (For Non-List Items)
-
-private func applyStyle(to str: NSMutableAttributedString, type: LegalParagraphType) {
+private func applyHeaderStyle(to str: NSMutableAttributedString) {
     let style = NSMutableParagraphStyle()
-    style.lineHeightMultiple = 1.0
+    style.alignment = .center
+    style.paragraphSpacing = 0
+    str.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: str.length))
     
-    let range = NSRange(location: 0, length: str.length)
-    
-    switch type {
-    case .headerMetadata:
-        style.alignment = .center
-        style.paragraphSpacing = 0
-        // Bold specific lines
-        let text = str.string.lowercased()
-        if text.contains("in the") || text.contains("between") || text.contains("witness") {
-            applyBold(to: str, range: range)
-        }
-        
-    case .documentTitle:
-        style.alignment = .center
-        style.paragraphSpacing = 24
-        applyBold(to: str, range: range)
-        // Uppercase
-        let upper = str.string.uppercased()
-        str.replaceCharacters(in: range, with: upper)
-        
-    case .intro:
-        style.alignment = .left
-        style.paragraphSpacing = 12
-        
-    case .heading:
-        style.alignment = .left
-        style.paragraphSpacingBefore = 18
-        style.paragraphSpacing = 6
-        applyBold(to: str, range: range)
-        
-    case .quote:
-        style.alignment = .left
-        style.headIndent = 36
-        style.firstLineHeadIndent = 36
-        style.paragraphSpacing = 12
-        
-    case .statementOfTruth:
-        style.alignment = .left
-        style.paragraphSpacingBefore = 24
-        applyBold(to: str, range: range)
-        
-    case .signature:
-        style.alignment = .left
-        style.paragraphSpacing = 24
-        
-    default:
-        style.alignment = .left
+    // Bold specific words
+    let text = str.string.lowercased()
+    if text.contains("in the") || text.contains("between") || text.contains("witness") {
+        boldEverything(in: str)
     }
-    
-    str.addAttribute(.paragraphStyle, value: style, range: range)
 }
 
-// MARK: - Document Analysis (State Machine)
+private func applyTitleStyle(to str: NSMutableAttributedString) {
+    let style = NSMutableParagraphStyle()
+    style.alignment = .center
+    style.paragraphSpacing = 24
+    str.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: str.length))
+    boldEverything(in: str)
+    
+    let upper = str.string.uppercased()
+    str.replaceCharacters(in: NSRange(location: 0, length: str.length), with: upper)
+}
+
+private func applyBodyStyle(to str: NSMutableAttributedString) {
+    let style = NSMutableParagraphStyle()
+    style.alignment = .left
+    style.paragraphSpacing = 12
+    str.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: str.length))
+}
+
+private func applyHeadingStyle(to str: NSMutableAttributedString) {
+    let style = NSMutableParagraphStyle()
+    style.alignment = .left
+    style.paragraphSpacingBefore = 18
+    style.paragraphSpacing = 6
+    str.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: str.length))
+    boldEverything(in: str)
+}
+
+private func applyQuoteStyle(to str: NSMutableAttributedString) {
+    let style = NSMutableParagraphStyle()
+    style.alignment = .justified
+    style.headIndent = 36
+    style.firstLineHeadIndent = 36
+    style.paragraphSpacing = 12
+    str.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: str.length))
+}
+
+// MARK: - Text Processing Helpers
+
+private func stripManualNumbering(_ text: String) -> String {
+    // Matches "1.", "304.", "1 ", "(a)", "a)"
+    // We strip this so the auto-numbering doesn't duplicate it.
+    let pattern = "^\\s*(\\d+|\\([a-zA-Z0-9]+\\)|[a-zA-Z0-9]+\\))[.)]?\\s+"
+    
+    if let regex = try? NSRegularExpression(pattern: pattern, options: []) {
+        let range = NSRange(location: 0, length: text.utf16.count)
+        // Only remove if it's at the very start
+        let modified = regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "")
+        
+        // Only return modified if we actually stripped something substantial (avoid stripping single words by accident)
+        // Heuristic: If we removed < 6 chars, it's likely a number.
+        if text.count - modified.count > 0 {
+            return modified
+        }
+    }
+    return text
+}
+
+private func isSubPoint(_ text: String) -> Bool {
+    // Detects "(a)", "a.", "a)"
+    let pattern = "^\\s*\\(?([a-zA-Z])\\)[.)]?\\s+"
+    return text.range(of: pattern, options: .regularExpression) != nil
+}
+
+// MARK: - Structure Analysis
 
 private func detectDocumentStructure(in document: NSAttributedString) -> [AnalysisResult.FormattedRange] {
     var ranges: [AnalysisResult.FormattedRange] = []
     let fullString = document.string as NSString
     let fullRange = NSRange(location: 0, length: fullString.length)
     
-    // Keywords
-    let headerKeywords = ["case no", "case ref", "claim no", "in the", "tribunal", "between:", "-v-", "-and-"]
+    let headerKeywords = ["case no", "case ref", "claim no", "in the", "tribunal", "between:", "applicant", "respondent", "-v-", "-and-"]
     let titleKeywords = ["witness statement"]
     let introKeywords = ["will say as follows", "states as follows"]
     let truthKeywords = ["statement of truth", "believe that the facts"]
     
-    enum ScanState {
-        case header, preBody, body, backMatter
-    }
-    
+    enum ScanState { case header, preBody, body, backMatter }
     var currentState: ScanState = .header
     
     fullString.enumerateSubstrings(in: fullRange, options: .byParagraphs) { substring, substringRange, _, _ in
@@ -263,7 +301,6 @@ private func detectDocumentStructure(in document: NSAttributedString) -> [Analys
                 type = .intro
                 currentState = .preBody
             }
-            
         case .preBody:
             if containsAny(text, keywords: introKeywords) {
                 type = .intro
@@ -273,28 +310,25 @@ private func detectDocumentStructure(in document: NSAttributedString) -> [Analys
             } else {
                 type = .intro
             }
-            
         case .body:
             if containsAny(text, keywords: truthKeywords) {
                 type = .statementOfTruth
                 currentState = .backMatter
-            } else if isHeading(text) {
+            } else if isHeading(substring ?? "") {
                 type = .heading
             } else {
                 type = .body
             }
-            
         case .backMatter:
             type = .signature
         }
         
         ranges.append(AnalysisResult.FormattedRange(range: substringRange, type: type))
     }
-    
     return ranges
 }
 
-// MARK: - Helpers
+// MARK: - Utilities
 
 private func generateLegalHeader(_ metadata: LegalHeaderMetadata) -> NSAttributedString {
     let content = """
@@ -314,9 +348,7 @@ private func generateLegalHeader(_ metadata: LegalHeaderMetadata) -> NSAttribute
     
     """
     let attr = NSMutableAttributedString(string: content)
-    let style = NSMutableParagraphStyle()
-    style.alignment = .center
-    attr.addAttribute(.paragraphStyle, value: style, range: NSRange(location: 0, length: attr.length))
+    applyHeaderStyle(to: attr)
     return attr
 }
 
@@ -326,31 +358,28 @@ private func applyBaseFont(to doc: NSMutableAttributedString, range: NSRange) {
     
     doc.enumerateAttribute(.font, in: range, options: []) { value, subRange, _ in
         if let existing = value as? NSFont {
-            let traits = existing.fontDescriptor.symbolicTraits
-            let newDescriptor = baseFont.fontDescriptor.withSymbolicTraits(traits)
-            if let newFont = NSFont(descriptor: newDescriptor, size: LegalFormattingDefaults.fontSize) {
-                doc.addAttribute(.font, value: newFont, range: subRange)
-            } else {
-                // Fallback to baseFont if descriptor-based font creation fails
-                doc.addAttribute(.font, value: baseFont, range: subRange)
-            }
+            // Preserve existing traits (e.g., bold/italic) while forcing family/size
+            let existingTraits = existing.fontDescriptor.symbolicTraits
+            let targetDesc = baseFont.fontDescriptor.withSymbolicTraits(existingTraits)
+            let newFont = NSFont(descriptor: targetDesc, size: LegalFormattingDefaults.fontSize) ?? baseFont
+            doc.addAttribute(.font, value: newFont, range: subRange)
         } else {
             doc.addAttribute(.font, value: baseFont, range: subRange)
         }
     }
 }
 
+private func boldEverything(in str: NSMutableAttributedString) {
+    let range = NSRange(location: 0, length: str.length)
+    applyBold(to: str, range: range)
+}
+
 private func applyBold(to str: NSMutableAttributedString, range: NSRange) {
     let font = NSFont(name: LegalFormattingDefaults.fontFamily, size: LegalFormattingDefaults.fontSize)
         ?? NSFont.systemFont(ofSize: LegalFormattingDefaults.fontSize)
     let boldDesc = font.fontDescriptor.withSymbolicTraits(.bold)
-    if let boldFont = NSFont(descriptor: boldDesc, size: LegalFormattingDefaults.fontSize) {
-        str.addAttribute(.font, value: boldFont, range: range)
-    } else {
-        // Fallback to system bold if creation fails
-        let fallbackBold = NSFont.boldSystemFont(ofSize: LegalFormattingDefaults.fontSize)
-        str.addAttribute(.font, value: fallbackBold, range: range)
-    }
+    let boldFont = NSFont(descriptor: boldDesc, size: LegalFormattingDefaults.fontSize) ?? font
+    str.addAttribute(.font, value: boldFont, range: range)
 }
 
 private func containsAny(_ text: String, keywords: [String]) -> Bool {
@@ -363,4 +392,3 @@ private func isHeading(_ text: String) -> Bool {
     guard clean.count < 100 else { return false }
     return clean.range(of: "^[A-Z0-9]+\\.\\s", options: .regularExpression) != nil
 }
-

@@ -69,6 +69,12 @@ private func generateHTML(
         ol {
             margin-bottom: 12pt;
             padding-left: 36pt; /* Hanging Indent */
+            list-style-type: decimal;
+            list-style-position: outside;
+        }
+        ol.sublist {
+            list-style-type: lower-alpha;
+            list-style-position: outside;
         }
         li {
             text-align: justify;
@@ -173,7 +179,7 @@ private func generateHTML(
                     html += "</ol><ol start='\(number)'>"
                 }
 
-                html += "<li>\(content)"
+                html += "<li><p>\(content)</p>"
                 hasOpenMainListItem = true
                 lastMainNumber = number
 
@@ -192,10 +198,10 @@ private func generateHTML(
                 let startValue = max(1, letterListIndex(letter))
 
                 if !isInSubList {
-                    html += "<ol type='a' start='\(startValue)'>"
+                    html += "<ol class='sublist' type='a' start='\(startValue)'>"
                     isInSubList = true
                 }
-                html += "<li>\(content)</li>"
+                html += "<li><p>\(content)</p></li>"
 
             case .none:
                 // Treat as a standard paragraph outside of numbered lists
@@ -227,15 +233,18 @@ private func generateHTML(
             html += "<p>\(cleanText)</p>"
         }
     }
-    
+
     if isInSubList {
         html += "</ol>"
+        isInSubList = false
     }
     if hasOpenMainListItem {
         html += "</li>"
+        hasOpenMainListItem = false
     }
     if isInMainList {
         html += "</ol>"
+        isInMainList = false
     }
     
     html += "</body></html>"

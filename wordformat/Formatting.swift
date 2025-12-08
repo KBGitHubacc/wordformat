@@ -23,10 +23,12 @@ func applyUKLegalFormatting(
     analysis: AnalysisResult?
 ) {
     guard document.length > 0 else { return }
+    Logger.shared.log("Formatting start. Total length: \(document.length)", category: "FORMAT")
     
     // 1. Identify the "Split Point" between Header/Intro and the Numbered Body
     // Prefer AI-derived split if available; otherwise fallback to heuristic.
     let splitIndex = findBodyStartIndex(in: document.string, analysis: analysis)
+    Logger.shared.log("Split index at \(splitIndex)", category: "FORMAT")
     
     // 2. Separate the Document into Two Parts
     let headerRange = NSRange(location: 0, length: max(0, splitIndex))
@@ -37,10 +39,13 @@ func applyUKLegalFormatting(
     let headerPart = document.attributedSubstring(from: headerRange).mutableCopy() as! NSMutableAttributedString
     styleHeaderPart(headerPart)
     
-    // 4. Process Body (NSTextList - True Word List Objects)
-    // We extract the text, clean it, and rebuild it using NSTextList so DOCX gets real numbering.
-    let bodyText = document.attributedSubstring(from: bodyRange).string
-    let formattedBody = generateDynamicListBody(from: bodyText, analysis: analysis)
+    // 4. Process Body (Preserve and rebuild numbering based on list attributes)
+    // IMPORTANT: When we read a DOCX into an attributed string, Word list numbers are NOT in the plain text.
+    // They live in paragraph attributes (`textLists`). Converting to `string` would lose them, so we work
+    // with the attributed body directly.
+    let bodyPart = document.attributedSubstring(from: bodyRange)
+    Logger.shared.log("Header length: \(headerRange.length), body length: \(bodyRange.length)", category: "FORMAT")
+    let formattedBody = generateDynamicListBody(from: bodyPart, analysis: analysis)
     
     // 5. Stitch Together
     let finalDoc = NSMutableAttributedString()
@@ -55,8 +60,6 @@ func applyUKLegalFormatting(
     // 7. Update Document
     document.setAttributedString(finalDoc)
 }
-
-// MARK: - Step 1: Safe Header Styling
 
 private func styleHeaderPart(_ attrString: NSMutableAttributedString) {
     let fullRange = NSRange(location: 0, length: attrString.length)
@@ -101,123 +104,123 @@ private func styleHeaderPart(_ attrString: NSMutableAttributedString) {
     }
 }
 
-// MARK: - Step 2: Dynamic List Generation (NSTextList -> Word-native numbering)
+// MARK: - Step 2: Dynamic List Generation (Preserve Word-native numbering)
 
-private func generateDynamicListBody(from text: String, analysis: AnalysisResult?) -> NSAttributedString {
+private func generateDynamicListBody(from originalBody: NSAttributedString, analysis: AnalysisResult?) -> NSAttributedString {
     let result = NSMutableAttributedString()
     let baseFont = NSFont(name: LegalFormattingDefaults.fontFamily, size: LegalFormattingDefaults.fontSize)
         ?? NSFont.systemFont(ofSize: LegalFormattingDefaults.fontSize)
     
-    // Split into logical paragraphs
-    let paragraphs = text.components(separatedBy: .newlines)
+    let nsText = originalBody.string as NSString
+    var cursor = 0
     
-    // Tracking nested lists; reuse the same NSTextList instances across contiguous runs
-    var listStack: [NSTextList] = []
-    var currentLevel = 0
+    // Fresh list objects to ensure deterministic numbering (auto-renumber on insert/delete).
+    let level1List = NSTextList(markerFormat: .decimal, options: 0)
+    let level2List = NSTextList(markerFormat: .lowercaseAlpha, options: 0)
+    let level3List = NSTextList(markerFormat: .lowercaseRoman, options: 0)
+
+    // Regex helpers for manual markers (if present, we strip them and rely on lists).
+    let patternLevel1 = "^\\s*\\d+[.)]\\s+"
+    let patternLevel2 = "^\\s*\\(?[a-zA-Z]\\)[.)]\\s+"
+    let patternLevel3 = "^\\s*\\(?[ivx]+\\)[.)]\\s+"
     
-    // Regex for detecting list items
-    // Level 1: "1.", "304."
-    let pattern1 = "^\\s*\\d+[.)]\\s+"
-    // Level 2: "(a)", "a."
-    let pattern2 = "^\\s*\\(?[a-zA-Z]\\)[.)]\\s+"
-    // Level 3: "(i)", "i."
-    let pattern3 = "^\\s*\\(?[ivx]+\\)[.)]\\s+"
+    // Optional AI guidance lookup
+    let typeLookup = makeTypeLookup(analysis: analysis)
+    let ns = originalBody.string as NSString
+    let paraCount = ns.components(separatedBy: .newlines).count
+    Logger.shared.log("Body paragraphs (approx): \(paraCount)", category: "FORMAT")
     
-    for line in paragraphs {
-        let cleanLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
-        if cleanLine.isEmpty {
-            // Blank lines break list sequences in most legal docs.
-            if currentLevel > 0 {
-                listStack.removeAll()
-                currentLevel = 0
-            }
+    var levelCounts = [0: 0, 1: 0, 2: 0, 3: 0]
+    var sampleLogged = 0
+    
+    while cursor < originalBody.length {
+        let paraRange = nsText.paragraphRange(for: NSRange(location: cursor, length: 0))
+        let rawParagraphAttr = originalBody.attributedSubstring(from: paraRange)
+        let rawParagraph = nsText.substring(with: paraRange)
+        let cleanParagraph = rawParagraph.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Classification (AI guided if available)
+        let classifiedType = typeLookup(paraRange) ?? .unknown
+        let isHeadingPara = isHeading(cleanParagraph) || classifiedType == .heading
+        let isStatementOfTruth = cleanParagraph.lowercased().contains("statement of truth") || classifiedType == .statementOfTruth
+        
+        // Blank lines: keep as spacer, but do not attach list
+        if cleanParagraph.isEmpty {
+            cursor = paraRange.upperBound
             continue
         }
         
-        // Statement of truth breaks lists and is bolded
-        if cleanLine.lowercased().contains("statement of truth") {
-            // Close lists
-            if currentLevel > 0 {
-                listStack.removeAll()
-                currentLevel = 0
-            }
-            let p = paragraph(text: cleanLine, font: baseFont, alignment: .justified, bold: true)
-            result.append(p)
-            result.append(NSAttributedString(string: "\n"))
-            continue
-        }
+        // Prepare mutable paragraph with preserved inline styling
+        let mutablePara = rawParagraphAttr.mutableCopy() as! NSMutableAttributedString
+        let paraStyle = (mutablePara.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
+        paraStyle.alignment = .justified
+        paraStyle.paragraphSpacing = 12
         
-        // Determine Level and content
+        // Decide list level
         var level = 0
-        var content = cleanLine
-        
-        if rangeOfPattern(pattern3, in: cleanLine) != nil {
-            level = 3
-            content = stripPattern(pattern3, from: cleanLine).trimmingCharacters(in: .whitespaces)
-        } else if rangeOfPattern(pattern2, in: cleanLine) != nil {
-            level = 2
-            content = stripPattern(pattern2, from: cleanLine).trimmingCharacters(in: .whitespaces)
-        } else if rangeOfPattern(pattern1, in: cleanLine) != nil {
-            level = 1
-            content = stripPattern(pattern1, from: cleanLine).trimmingCharacters(in: .whitespaces)
-        } else {
-            level = 0
-        }
-        
-        // Adjust list depth
-        if level > currentLevel {
-            // Open new lists up to the target level
-            while currentLevel < level {
-                let format = markerFormat(for: currentLevel + 1)
-                let newList = NSTextList(markerFormat: format, options: 0)
-                listStack.append(newList)
-                currentLevel += 1
-            }
-        } else if level < currentLevel && level > 0 {
-            // Close lists down to target level
-            while currentLevel > level {
-                _ = listStack.popLast()
-                currentLevel -= 1
-            }
-        } else if level == 0 && currentLevel > 0 {
-            // Non-numbered paragraph breaks list
-            listStack.removeAll()
-            currentLevel = 0
-        }
-        
-        // Output content
-        if level > 0 {
-            // Paragraph styled as a list item via NSTextList (no manual marker in text)
-            let style = NSMutableParagraphStyle()
-            style.alignment = .justified
-            style.paragraphSpacing = 12
-            style.textLists = listStack
-            // Indentation per level (approx 18-24 pt per level)
-            let indentPerLevel: CGFloat = 24.0
-            style.headIndent = indentPerLevel * CGFloat(level)
-            style.firstLineHeadIndent = indentPerLevel * CGFloat(level)
-            
-            let attrs: [NSAttributedString.Key: Any] = [
-                .font: baseFont,
-                .paragraphStyle: style
-            ]
-            let para = NSAttributedString(string: content, attributes: attrs)
-            result.append(para)
-            result.append(NSAttributedString(string: "\n"))
-        } else {
-            // Heading or plain text
-            if isHeading(cleanLine) {
-                let p = paragraph(text: content, font: baseFont, alignment: .justified, bold: true)
-                result.append(p)
-                result.append(NSAttributedString(string: "\n"))
+        if !isHeadingPara && !isStatementOfTruth {
+            if rangeOfPattern(patternLevel3, in: cleanParagraph) != nil {
+                level = 3
+            } else if rangeOfPattern(patternLevel2, in: cleanParagraph) != nil {
+                level = 2
             } else {
-                let p = paragraph(text: content, font: baseFont, alignment: .justified, bold: false)
-                result.append(p)
-                result.append(NSAttributedString(string: "\n"))
+                // Default: treat as main numbered paragraph
+                level = 1
             }
         }
+        
+        // Strip manual markers if present (content is preserved otherwise).
+        var paragraphContent = cleanParagraph
+        if level == 3 {
+            paragraphContent = stripPattern(patternLevel3, from: paragraphContent).trimmingCharacters(in: .whitespaces)
+        } else if level == 2 {
+            paragraphContent = stripPattern(patternLevel2, from: paragraphContent).trimmingCharacters(in: .whitespaces)
+        } else if level == 1 && rangeOfPattern(patternLevel1, in: paragraphContent) != nil {
+            paragraphContent = stripPattern(patternLevel1, from: paragraphContent).trimmingCharacters(in: .whitespaces)
+        }
+        
+        // Apply list styles
+        if level == 0 {
+            paraStyle.textLists = []
+            paraStyle.firstLineHeadIndent = 0
+            paraStyle.headIndent = 0
+        } else if level == 1 {
+            paraStyle.textLists = [level1List]
+            paraStyle.headIndent = 24
+            paraStyle.firstLineHeadIndent = 24
+        } else if level == 2 {
+            paraStyle.textLists = [level1List, level2List]
+            paraStyle.headIndent = 48
+            paraStyle.firstLineHeadIndent = 48
+        } else {
+            paraStyle.textLists = [level1List, level2List, level3List]
+            paraStyle.headIndent = 72
+            paraStyle.firstLineHeadIndent = 72
+        }
+        
+        levelCounts[level, default: 0] += 1
+        if sampleLogged < 25 {
+            Logger.shared.log("Para level \(level) heading:\(isHeadingPara) truth:\(isStatementOfTruth) text: \(paragraphContent.prefix(120))", category: "FORMAT")
+            sampleLogged += 1
+        }
+        
+        // Replace text with stripped content while keeping inline attributes
+        mutablePara.mutableString.setString(paragraphContent)
+        mutablePara.addAttribute(.paragraphStyle, value: paraStyle, range: NSRange(location: 0, length: mutablePara.length))
+        
+        // Font handling (preserve existing traits, bold statement of truth)
+        let existingFont = mutablePara.attribute(.font, at: 0, effectiveRange: nil) as? NSFont
+        let appliedFont = baseFontWithExistingTraits(baseFont: baseFont, existing: existingFont)
+        let finalFont = isStatementOfTruth ? boldVariant(of: appliedFont) : appliedFont
+        mutablePara.addAttribute(.font, value: finalFont, range: NSRange(location: 0, length: mutablePara.length))
+        
+        result.append(mutablePara)
+        result.append(NSAttributedString(string: "\n"))
+        
+        cursor = paraRange.upperBound
     }
     
+    Logger.shared.log("Level counts -> level0:\(levelCounts[0, default:0]) level1:\(levelCounts[1, default:0]) level2:\(levelCounts[2, default:0]) level3:\(levelCounts[3, default:0])", category: "FORMAT")
     return result
 }
 
@@ -325,3 +328,93 @@ private func applyBold(to str: NSMutableAttributedString, range: NSRange) {
         ?? NSFontManager.shared.convert(baseFont, toHaveTrait: .boldFontMask)
     str.addAttribute(.font, value: boldFont, range: range)
 }
+
+// MARK: - Font helpers
+
+/// Returns the base font while keeping any existing symbolic traits (bold/italic) from the source font.
+private func baseFontWithExistingTraits(baseFont: NSFont, existing: NSFont?) -> NSFont {
+    guard let existing else { return baseFont }
+    let traits = existing.fontDescriptor.symbolicTraits
+    let descriptor = baseFont.fontDescriptor.withSymbolicTraits(traits)
+    return NSFont(descriptor: descriptor, size: baseFont.pointSize) ?? baseFont
+}
+
+// MARK: - Numbering targets extraction
+
+/// Build numbering targets from the fully formatted document, using AI paragraph levels when available.
+func buildNumberingTargets(from doc: NSAttributedString, analysis: AnalysisResult?) -> [DocxNumberingPatcher.NumberingTarget] {
+    let ns = doc.string as NSString
+    var targets: [DocxNumberingPatcher.NumberingTarget] = []
+    // Read AI paragraph levels if present; default to empty when unavailable.
+    let aiLevels: [Int: Int] = {
+        guard let analysis else { return [:] }
+        let mirror = Mirror(reflecting: analysis)
+        if let levels = mirror.children.first(where: { $0.label == "paragraphLevels" })?.value as? [Int: Int] {
+            return levels
+        }
+        return [:]
+    }()
+    let splitIndex = findBodyStartIndex(in: doc.string, analysis: analysis)
+    Logger.shared.log("Target builder using splitIndex \(splitIndex)", category: "PATCH")
+    
+    var paraIndex = 0
+    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, range, _, _ in
+        defer { paraIndex += 1 }
+        guard range.location >= splitIndex else { return } // skip header
+        let text = (substring ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if text.isEmpty { return }
+        
+        // Heading detection
+        let isHeadingPara = isHeading(text)
+        if isHeadingPara { return }
+        
+        let attrStyle = doc.attribute(.paragraphStyle, at: range.location, effectiveRange: nil) as? NSParagraphStyle
+        let indent = attrStyle?.headIndent ?? 0
+        
+        // Determine level
+        var level = aiLevels[paraIndex] ?? 0
+        if level == 0 {
+            // Fallback to marker/indent heuristics
+            if rangeOfPattern("^\\s*\\(?[a-zA-Z]\\)", in: text) != nil || indent >= 44 {
+                level = 1
+            }
+            if rangeOfPattern("^\\s*\\(?[ivx]+\\)", in: text.lowercased()) != nil || indent >= 80 {
+                level = 2
+            }
+        }
+        
+        // Record all numbered levels (including main level 0)
+        targets.append(.init(paragraphIndex: paraIndex, level: max(0, level)))
+    }
+    if !targets.isEmpty {
+        let sample = targets.prefix(10).map { "[\($0.paragraphIndex):\($0.level)]" }.joined(separator: " ")
+        Logger.shared.log("Built \(targets.count) numbering targets from document paragraphs. Sample: \(sample)", category: "PATCH")
+    } else {
+        Logger.shared.log("No numbering targets built", category: "PATCH")
+    }
+    return targets
+}
+/// Bold variant of a given font, preserving family where possible.
+private func boldVariant(of font: NSFont) -> NSFont {
+    let desc = font.fontDescriptor.withSymbolicTraits(.bold)
+    return NSFont(descriptor: desc, size: font.pointSize) ?? NSFontManager.shared.convert(font, toHaveTrait: .boldFontMask)
+}
+
+// MARK: - AI type lookup helper
+
+private func makeTypeLookup(analysis: AnalysisResult?) -> (NSRange) -> LegalParagraphType? {
+    guard let analysis else {
+        return { _ in nil }
+    }
+    let ranges = analysis.classifiedRanges
+    return { paraRange in
+        // Pick the first matching type that intersects this paragraph.
+        for item in ranges {
+            if NSIntersectionRange(item.range, paraRange).length > 0 {
+                return item.type
+            }
+        }
+        return nil
+    }
+}
+

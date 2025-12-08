@@ -82,6 +82,7 @@ struct ContentView: View {
         
         if panel.runModal() == .OK, let url = panel.url {
             status = "Processing \(url.lastPathComponent)..."
+            Logger.shared.log("Selected file: \(url.path)", category: "UI")
             isProcessing = true
             
             Task {
@@ -102,6 +103,12 @@ struct ContentView: View {
             )
 
             let mutableDoc = try loadDocx(from: url)
+            Logger.shared.log("Loaded DOCX. Length \(mutableDoc.length) chars", category: "DOCX")
+            Logger.shared.log("Log file path: \(Logger.shared.currentLogPath())", category: "LOG")
+            
+            // Precompute paragraph texts for AI chunking
+            let paragraphTexts = extractParagraphTexts(from: mutableDoc)
+            Logger.shared.log("Paragraphs in source: \(paragraphTexts.count)", category: "DOCX")
             
             // AI Analysis Step
             var analysisResult: AnalysisResult? = nil
@@ -112,22 +119,46 @@ struct ContentView: View {
                 let plainText = mutableDoc.string
                 do {
                     let ranges = try await aiService.analyseDocumentStructure(text: plainText)
-                    analysisResult = AnalysisResult(classifiedRanges: ranges)
+                    let levels = try await aiService.analyseParagraphLevels(paragraphs: paragraphTexts)
+                    analysisResult = AnalysisResult(classifiedRanges: ranges, paragraphLevels: levels)
+                    Logger.shared.log("AI returned \(ranges.count) classified ranges", category: "AI")
+                    Logger.shared.log("AI paragraph levels: \(levels.count)", category: "AI")
                 } catch {
-                    status += "\nAI Error: \(error.localizedDescription). Falling back to standard logic."
+                    status += "\nAI Error: \(error.localizedDescription).\nProceeding with offline heuristics only (formatting will still run)."
+                    Logger.shared.log(error: error, category: "AI")
                 }
+            } else {
+                Logger.shared.log("AI key not provided. Skipping AI analysis.", category: "AI")
             }
 
             // Reconstruction
             status += "\nRebuilding document..."
+            Logger.shared.log("Applying formatting…", category: "FORMAT")
             applyUKLegalFormatting(to: mutableDoc, header: header, analysis: analysisResult)
 
             let outputURL = makeOutputURL(from: url)
             try saveDocx(mutableDoc, to: outputURL)
+            Logger.shared.log("Saved formatted DOCX to \(outputURL.path)", category: "DOCX")
+            
+            // Post-process DOCX to inject native numbering
+            let targets = buildNumberingTargets(from: mutableDoc, analysis: analysisResult)
+            if !targets.isEmpty {
+                Logger.shared.log("Patcher will apply numbering to \(targets.count) paragraphs", category: "PATCH")
+                let patcher = DocxNumberingPatcher()
+                do {
+                    try patcher.applyNumbering(to: outputURL, targets: targets)
+                    Logger.shared.log("Patcher completed successfully", category: "PATCH")
+                } catch {
+                    Logger.shared.log("Patcher failed: \(error)", category: "PATCH")
+                }
+            } else {
+                Logger.shared.log("Patcher skipped: no numbering targets detected", category: "PATCH")
+            }
 
             status = "Success!\nSaved to: \(outputURL.path)"
         } catch {
             status = "Error: \(error.localizedDescription)"
+            Logger.shared.log(error: error, category: "APP")
         }
     }
 }

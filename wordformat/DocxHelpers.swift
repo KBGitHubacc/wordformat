@@ -57,3 +57,13 @@ func makeOutputURL(from inputURL: URL) -> URL {
     
     return folder.appendingPathComponent(newName)
 }
+
+/// Extract plain paragraph texts from an attributed string, in order.
+func extractParagraphTexts(from attr: NSAttributedString) -> [String] {
+    var paragraphs: [String] = []
+    let ns = attr.string as NSString
+    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, _, _, _ in
+        paragraphs.append(substring ?? "")
+    }
+    return paragraphs
+}

@@ -21,6 +21,8 @@ enum LegalParagraphType: String, Codable {
 
 struct AnalysisResult {
     var classifiedRanges: [FormattedRange] = []
+    /// Optional per-paragraph level classification (0=main,1=sub,a;2=subsub,i)
+    var paragraphLevels: [Int: Int] = [:]
     
     struct FormattedRange {
         var range: NSRange

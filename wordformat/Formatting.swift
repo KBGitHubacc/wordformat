@@ -36,6 +36,9 @@ func applyUKLegalFormatting(
     // 0. Sanity check – if there is no text, nothing to format.
     guard document.length > 0 else { return }
     
+    // Keep a copy of the original body string so we can assert content preservation later.
+    let originalBodyString = document.string
+    
     // 1. Idempotence guard – if document already appears to have this header, bail out.
     let prefixLength = min(200, document.length)
     let prefix = (document.string as NSString).substring(to: prefixLength)
@@ -73,7 +76,7 @@ func applyUKLegalFormatting(
     let headerLength = headerString.length
     document.insert(headerString, at: 0)
     
-    // 4. Apply numbered paragraph formatting to the **body only**.
+    // 4. Apply numbered paragraph formatting to the body only.
     let fullRangeAfterHeader = NSRange(
         location: headerLength,
         length: document.length - headerLength
@@ -93,8 +96,8 @@ func applyUKLegalFormatting(
         )
     }
     
-    // 6. Apply body line spacing (1.5) and paragraph spacing ONLY to the body text,
-    //    preserving other paragraph style properties (alignment, lists, etc.).
+    // 6. Apply body line spacing (1.5), paragraph spacing, and justified alignment
+    //    ONLY to the body text, preserving other paragraph style properties.
     applyBodyLineSpacing(
         to: document,
         in: fullRangeAfterHeader
@@ -109,6 +112,9 @@ func applyUKLegalFormatting(
         familyName: LegalFormattingDefaults.fontFamilyName,
         pointSize: LegalFormattingDefaults.fontSize
     )
+    
+    // 8. Content-preservation invariant (debug): the body text must be identical.
+    verifyContentInvariant(originalBody: originalBodyString, in: document, headerLength: headerLength)
 }
 
 // MARK: - Header construction
@@ -188,6 +194,7 @@ private func makeLegalHeaderString(
 
 /// Apply numbered paragraphs to the body range, skipping blank paragraphs.
 /// This uses NSTextList so Word sees it as a proper numbered list.
+/// IMPORTANT: Apply to the enclosingRange (includes the paragraph terminator).
 private func applyNumberedParagraphs(
     to document: NSMutableAttributedString,
     in range: NSRange
@@ -200,12 +207,12 @@ private func applyNumberedParagraphs(
     bodyString.enumerateSubstrings(
         in: NSRange(location: 0, length: bodyString.length),
         options: .byParagraphs
-    ) { _, paragraphRange, _, _ in
+    ) { _, _, enclosingRange, _ in
         
-        // Map local range back to global range in the document.
+        // Map local enclosing range (includes newline) back to global range in the document.
         let globalRange = NSRange(
-            location: range.location + paragraphRange.location,
-            length: paragraphRange.length
+            location: range.location + enclosingRange.location,
+            length: enclosingRange.length
         )
         
         let paragraphText = fullNSString.substring(with: globalRange)
@@ -236,8 +243,9 @@ private func applyNumberedParagraphs(
 
 // MARK: - Line spacing for body text
 
-/// Apply 1.5 line spacing and paragraph spacing to body paragraphs,
-/// preserving other paragraph style attributes (alignment, lists, etc.).
+/// Apply 1.5 line spacing, paragraph spacing, and justified alignment to body paragraphs,
+/// preserving other paragraph style attributes (alignment, lists, indents, etc.).
+/// IMPORTANT: Apply to the enclosingRange (includes the paragraph terminator).
 private func applyBodyLineSpacing(
     to document: NSMutableAttributedString,
     in range: NSRange
@@ -247,10 +255,10 @@ private func applyBodyLineSpacing(
     fullNSString.enumerateSubstrings(
         in: range,
         options: .byParagraphs
-    ) { _, paragraphRange, _, _ in
+    ) { _, _, enclosingRange, _ in
         
-        // paragraphRange is already in the coordinate space of the full string.
-        let globalRange = paragraphRange
+        // enclosingRange is already in the coordinate space of the full string.
+        let globalRange = enclosingRange
         
         let currentStyle: NSMutableParagraphStyle
         if let style = document.attribute(.paragraphStyle,
@@ -263,6 +271,7 @@ private func applyBodyLineSpacing(
         
         currentStyle.lineHeightMultiple = LegalFormattingDefaults.bodyLineHeightMultiple
         currentStyle.paragraphSpacing = LegalFormattingDefaults.bodyParagraphSpacing
+        currentStyle.alignment = .justified
         
         document.addAttribute(.paragraphStyle, value: currentStyle, range: globalRange)
     }
@@ -320,7 +329,8 @@ private func applyTableStyles(
 // MARK: - Simple heuristic heading styling
 
 /// Very simple heuristic for headings of the form "A. INTRODUCTION", "B. FACTS", etc.
-/// Makes them bold with extra spacing.
+/// Makes them bold with extra spacing, preserving existing paragraph styles.
+/// IMPORTANT: Apply to the enclosingRange (includes the paragraph terminator).
 private func applySimpleHeuristicHeadings(
     in document: NSMutableAttributedString,
     bodyRange: NSRange,
@@ -334,7 +344,7 @@ private func applySimpleHeuristicHeadings(
     bodyString.enumerateSubstrings(
         in: NSRange(location: 0, length: bodyString.length),
         options: .byParagraphs
-    ) { substring, subrange, _, _ in
+    ) { substring, _, enclosingRange, _ in
         
         guard let line = substring?
             .trimmingCharacters(in: .whitespacesAndNewlines),
@@ -351,11 +361,20 @@ private func applySimpleHeuristicHeadings(
             if remainder.first == "." {
                 // This looks like "A. ..." – treat as heading.
                 let globalRange = NSRange(
-                    location: bodyRange.location + subrange.location,
-                    length: subrange.length
+                    location: bodyRange.location + enclosingRange.location,
+                    length: enclosingRange.length
                 )
                 
-                let paraStyle = NSMutableParagraphStyle()
+                // Preserve existing paragraph style and only tweak spacing.
+                let paraStyle: NSMutableParagraphStyle
+                if let style = document.attribute(.paragraphStyle,
+                                                  at: globalRange.location,
+                                                  effectiveRange: nil) as? NSParagraphStyle {
+                    paraStyle = style.mutableCopy() as! NSMutableParagraphStyle
+                } else {
+                    paraStyle = NSMutableParagraphStyle()
+                }
+                
                 paraStyle.paragraphSpacingBefore = 12
                 paraStyle.paragraphSpacing = 6
                 
@@ -376,5 +395,19 @@ private extension NSRange {
     func toOptional() -> NSRange? {
         if location == NSNotFound { return nil }
         return self
+    }
+}
+
+private func verifyContentInvariant(originalBody: String, in document: NSAttributedString, headerLength: Int) {
+    let full = document.string as NSString
+    guard headerLength <= full.length else { return }
+    let newBody = full.substring(from: headerLength)
+    if newBody != originalBody {
+        // This should never happen; formatting must not change body content.
+        // Log details and assert in debug builds.
+        let originalNewlines = originalBody.filter { $0 == "\n" }.count
+        let newNewlines = newBody.filter { $0 == "\n" }.count
+        NSLog("Invariant failed: body text changed. Newlines before: \(originalNewlines), after: \(newNewlines)")
+        assertionFailure("Body text changed during formatting – this is a bug.")
     }
 }

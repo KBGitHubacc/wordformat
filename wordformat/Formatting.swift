@@ -333,7 +333,11 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
 
     var targets: [DocxNumberingPatcher.NumberingTarget] = []
     let ns = doc.string as NSString
-    let (bodyStartChar, bodyStartPara) = findBodyStartIndexWithParaIndex(in: doc.string, analysis: analysis)
+    let (_, bodyStartPara) = findBodyStartIndexWithParaIndex(in: doc.string, analysis: analysis)
+
+    // Patterns for level detection (improved)
+    let level1Pattern = "^\\s*(?:\\([a-zA-Z]\\)|[a-zA-Z][).])\\s+"
+    let level2Pattern = "^\\s*(?:\\([ivxIVX]+\\)|[ivxIVX]+[).])\\s+"
 
     var paraIndex = 0
     ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, _, _, _ in
@@ -354,13 +358,17 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
         if let aiLevel = aiLevels[paraIndex] {
             level = aiLevel
         } else {
-            // Updated Regex for Targets
-            if text.range(of: "^\\s*(?:\\([ivxIVX]+\\)|[ivxIVX]+[).])\\s+", options: .regularExpression) != nil {
+            // Updated Regex + indent heuristics
+            if text.range(of: level2Pattern, options: .regularExpression) != nil {
                 level = 2
-            } else if text.range(of: "^\\s*(?:\\([a-zA-Z]\\)|[a-zA-Z][).])\\s+", options: .regularExpression) != nil {
+            } else if text.range(of: level1Pattern, options: .regularExpression) != nil {
                 level = 1
             } else {
-                level = 0
+                // indent-based fallback: inspect paragraph style if available
+                if let style = doc.attribute(.paragraphStyle, at: ns.rangeOfComposedCharacterSequence(at: max(0, ns.range(of: text).location)).location, effectiveRange: nil) as? NSParagraphStyle {
+                    if style.headIndent >= 80 { level = 2 }
+                    else if style.headIndent >= 36 { level = 1 }
+                }
             }
         }
         

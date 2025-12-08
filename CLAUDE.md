@@ -2,7 +2,19 @@
 
 ## Project Overview
 
-**wordformat** (also known as **LegalFormatterApp**) is a macOS application built with SwiftUI that automatically formats DOCX documents according to UK legal standards. The application transforms witness statements and legal documents into properly formatted versions with hierarchical numbering, appropriate styling, and correct header metadata.
+**wordformat** (also known as **LegalFormatterApp**) is a macOS application built with SwiftUI that automatically formats DOCX documents according to UK legal standards.
+
+### What This App Does (In Simple Terms)
+
+**The app reads a Word document and applies UK legal formatting. It MUST NOT change the content—only apply paragraph styles and UK legal formats.**
+
+Key principle: **Content is sacred**. The app only modifies:
+- Paragraph formatting (alignment, spacing, indentation)
+- Font styles (Times New Roman, 12pt)
+- Hierarchical numbering (1, 2, 3 → a, b, c → i, ii, iii)
+- Header/footer metadata styling
+
+The app preserves all text content exactly as written. It only restructures how that content is visually presented according to UK legal standards.
 
 ### Key Features
 
@@ -16,7 +28,7 @@
 ### Platform & Requirements
 
 - **Platform**: macOS 26.1+
-- **Language**: Swift 5.0
+- **Language**: Swift 6.2
 - **Framework**: SwiftUI
 - **IDE**: Xcode
 - **Development Team**: B7449FV8K6
@@ -80,10 +92,11 @@ Core formatting engine with two main phases:
 
 **Phase 2 - Body Processing** (`generateDynamicListBody()`, line 109):
 - Detects paragraph levels using regex patterns or AI guidance
-- Strips manual numbering markers (e.g., "1.", "a)", "i)")
-- Applies native `NSTextList` with proper indentation
+- Strips ONLY manual numbering markers (e.g., "1.", "a)", "i)") from the start of paragraphs
+- Applies native `NSTextList` with proper indentation for Word-native numbering
 - Three-level numbering: decimal → lower-alpha → lower-roman
-- Preserves inline formatting (bold, italic) from original
+- **Preserves ALL text content** (only formatting changes, no content changes)
+- Preserves inline formatting (bold, italic) from original document
 
 **Heuristics**:
 - Split point detection: looks for "will say as follows" or "WITNESS STATEMENT"
@@ -192,7 +205,7 @@ The app is sandboxed with the following entitlements (configured in project.pbxp
 
 ### Build Settings
 
-- **Swift Version**: 5.0
+- **Swift Version**: 6.2
 - **Optimization Level**: Debug: `-Onone`, Release: `-wholemodule`
 - **Code Signing**: Automatic, Team B7449FV8K6
 - **Product Bundle ID**: `com.kbkh.wordformat`
@@ -372,19 +385,37 @@ Review recent commits for style (from git log):
 
 ## Important Notes for AI Assistants
 
+### Critical Rule: NEVER CHANGE CONTENT
+
+**The cardinal rule of this application: Content is sacred. Only formatting changes are allowed.**
+
+This means:
+- ✅ Change font to Times New Roman 12pt
+- ✅ Apply paragraph alignment (justified, centered)
+- ✅ Add hierarchical numbering (1, a, i)
+- ✅ Adjust spacing and indentation
+- ✅ Style headers (bold, centered)
+- ❌ NEVER modify the actual text words
+- ❌ NEVER delete content (except manual numbering markers like "1.", "a)", "i)")
+- ❌ NEVER add new content
+- ❌ NEVER rewrite or paraphrase sentences
+- ❌ NEVER change capitalization (except specific cases like "WITNESS STATEMENT")
+
 ### What to Preserve
 
-1. **Inline Formatting**: Never strip bold/italic from original document
-2. **Text Content**: Only strip automatic numbering markers, keep all other text
-3. **NSTextList Objects**: These provide native Word numbering, don't replace with text
-4. **Log Statements**: Comprehensive logging is essential for debugging
+1. **All Text Content**: Every word, every sentence must remain exactly as written
+2. **Inline Formatting**: Never strip bold/italic from original document
+3. **Manual Numbering Markers**: Only strip numbering markers (like "1.", "a)", "i)") when applying native Word numbering—all other text stays
+4. **NSTextList Objects**: These provide native Word numbering, don't replace with text
+5. **Log Statements**: Comprehensive logging is essential for debugging
 
 ### What to Avoid
 
-1. **Don't hardcode numbering** in text (e.g., "1. Paragraph text")
-2. **Don't modify header content** beyond styling
-3. **Don't skip error handling** for file I/O operations
-4. **Don't remove sandbox entitlements** without understanding security implications
+1. **NEVER change document content** beyond formatting
+2. **Don't hardcode numbering** in text (e.g., "1. Paragraph text")
+3. **Don't modify header text content** (only apply styling)
+4. **Don't skip error handling** for file I/O operations
+5. **Don't remove sandbox entitlements** without understanding security implications
 
 ### Testing Checklist
 

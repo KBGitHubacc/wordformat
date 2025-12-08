@@ -15,11 +15,13 @@ enum LegalFormattingDefaults {
     static let fontSize: CGFloat = 12.0
     
     // Layout
-    static let bodyLineHeightMultiple: CGFloat = 1.0 // Standard spacing
-    static let bodyParagraphSpacing: CGFloat = 12.0  // Space after paragraph
+    static let bodyLineHeightMultiple: CGFloat = 1.0
+    static let bodyParagraphSpacing: CGFloat = 12.0
     
     // Indentation
-    static let hangingIndent: CGFloat = 36.0         // 1.27cm approx
+    // Standard indent for numbered lists (approx 1.27cm / 0.5 inch)
+    static let listHeadIndent: CGFloat = 36.0
+    static let listFirstLineIndent: CGFloat = 0.0 // Marker sits here
 }
 
 // MARK: - Main Entry Point
@@ -32,23 +34,23 @@ func applyUKLegalFormatting(
     guard document.length > 0 else { return }
     
     // 1. Analyse Structure
-    // We scan the document to map out what is Header, Body, Heading, etc.
+    // We rely on the state machine to identify the zones (Header vs Body vs Back Matter)
     let structure = detectDocumentStructure(in: document)
     
-    // 2. Insert Header ONLY if totally missing (idempotent check)
-    // If the doc starts with "Case No" or "IN THE", we assume it has a header.
+    // 2. Header Handling
+    // Check if header exists; if not, and we have metadata, insert it.
     let hasHeader = structure.first?.type == .headerMetadata
     if !hasHeader && !header.caseReference.isEmpty {
         insertGeneratedHeader(to: document, metadata: header)
-        // Re-scan required after insertion
+        // Re-scan required after insertion as ranges shifted
         let newStructure = detectDocumentStructure(in: document)
-        applyFormatting(to: document, structure: newStructure)
+        applyStructureStyles(to: document, structure: newStructure)
     } else {
-        applyFormatting(to: document, structure: structure)
+        applyStructureStyles(to: document, structure: structure)
     }
     
-    // 3. Global Font Normalisation (Last step to ensure uniformity)
-    // Enforce Times New Roman 12pt everywhere, preserving Bold/Italic traits.
+    // 3. Global Font Normalisation
+    // Convert everything to Times New Roman 12pt, preserving traits (Bold/Italic)
     let fullRange = NSRange(location: 0, length: document.length)
     applyBaseFontFamily(
         to: document,
@@ -65,47 +67,42 @@ private func detectDocumentStructure(in document: NSAttributedString) -> [Analys
     let fullString = document.string as NSString
     let fullRange = NSRange(location: 0, length: fullString.length)
     
-    // Keywords for detecting zones
+    // Keywords
     let headerKeywords = ["case no", "case ref", "claim no", "in the", "tribunal", "between:", "applicant", "respondent", "-v-", "-and-"]
     let titleKeywords = ["witness statement"]
     let introKeywords = ["will say as follows", "states as follows", "say as follows"]
     let truthKeywords = ["statement of truth", "believe that the facts"]
     
     enum ScanState {
-        case header      // Top of doc
-        case preBody     // Between title and "will say as follows"
-        case body        // The numbered paragraphs
-        case backMatter  // Statement of Truth / Signature
+        case header
+        case preBody
+        case body
+        case backMatter
     }
     
     var currentState: ScanState = .header
     
-    // We iterate by paragraphs
     fullString.enumerateSubstrings(in: fullRange, options: .byParagraphs) { substring, substringRange, _, _ in
         guard let rawText = substring else { return }
         let text = rawText.trimmingCharacters(in: .whitespacesAndNewlines)
         let lowerText = text.lowercased()
         
-        // Skip empty lines (but keep them in the range list to preserve spacing)
+        // Keep empty lines as 'unknown' to preserve spacing, but don't format them
         if text.isEmpty {
             ranges.append(AnalysisResult.FormattedRange(range: substringRange, type: .unknown))
             return
         }
         
-        var type: LegalParagraphType = .body // Default
+        var type: LegalParagraphType = .body
         
         switch currentState {
         case .header:
-            // logic: If we hit "Witness Statement", switch to Title.
-            // If we are still at the top and see "Case No" or "Applicant", it's Header.
             if containsAny(lowerText, keywords: titleKeywords) {
                 type = .documentTitle
                 currentState = .preBody
             } else if containsAny(lowerText, keywords: headerKeywords) || substringRange.location < 800 {
-                // Generous limit for header detection (800 chars)
                 type = .headerMetadata
             } else {
-                // If we drifted too far, assume Intro
                 type = .intro
                 currentState = .preBody
             }
@@ -113,7 +110,7 @@ private func detectDocumentStructure(in document: NSAttributedString) -> [Analys
         case .preBody:
             if containsAny(lowerText, keywords: introKeywords) {
                 type = .intro
-                currentState = .body // Next paragraph is definitely body
+                currentState = .body
             } else if containsAny(lowerText, keywords: titleKeywords) {
                 type = .documentTitle
             } else {
@@ -144,105 +141,159 @@ private func detectDocumentStructure(in document: NSAttributedString) -> [Analys
     return ranges
 }
 
-// MARK: - Styling & Numbering Application
+// MARK: - Styling & Native Numbering
 
-private func applyFormatting(
+private func applyStructureStyles(
     to document: NSMutableAttributedString,
     structure: [AnalysisResult.FormattedRange]
 ) {
-    // We must process in REVERSE order because we are inserting text (numbers).
-    // If we process forwards, the ranges for later paragraphs will shift and become invalid.
-    var bodyCounter = 1
+    // 1. Create a Single List Instance
+    // NSTextList objects must be reused across paragraphs to maintain sequential numbering (1, 2, 3...)
+    // If we create a new NSTextList for every paragraph, they will all be "1.".
+    let masterNumberingList = NSTextList(markerFormat: .decimal, options: 0)
+    masterNumberingList.startingItemNumber = 1
     
-    // First pass: Calculate which items are body paragraphs to assign numbers correctly (forward pass)
-    // We need to know the number *before* we iterate backwards.
-    var bodyIndices: [Int] = []
-    for (index, item) in structure.enumerated() {
-        if item.type == .body {
-            bodyIndices.append(index)
-        }
-    }
+    // We will assume sub-lists might restart, so we create them as needed or keep a running one.
+    // For simplicity in legal docs, (a) usually restarts under each number.
+    var currentSubList: NSTextList? = nil
     
-    let totalBodyParagraphs = bodyIndices.count
+    // We process in REVERSE to handle text deletion (stripping old numbers) without invalidating future ranges.
+    // However, since we are stripping text, we must be careful with the 'structure' ranges.
+    // It is safer to calculate the range dynamically or update offsets.
+    // Simplest approach: Process Reverse.
     
-    // Second pass: Apply changes in REVERSE order
-    for (index, item) in structure.enumerated().reversed() {
+    for item in structure.reversed() {
         let style = NSMutableParagraphStyle()
-        style.lineHeightMultiple = LegalFormattingDefaults.bodyLineHeightMultiple
         style.paragraphSpacing = LegalFormattingDefaults.bodyParagraphSpacing
+        style.lineHeightMultiple = LegalFormattingDefaults.bodyLineHeightMultiple
+        
+        // We need the current text to check for patterns
+        let currentRange = item.range
+        // Note: Because we are iterating backwards, the 'location' of earlier items remains valid.
+        // The 'length' might technically change if we modify *this* paragraph, but we handle that locally.
+        let paragraphText = (document.string as NSString).substring(with: currentRange)
         
         switch item.type {
         case .headerMetadata:
             style.alignment = .center
             style.paragraphSpacing = 0
-            // Bold specific lines (Court name, Parties)
-            boldImportantHeaderLines(in: document, range: item.range)
+            boldImportantHeaderLines(in: document, range: currentRange)
+            document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             
         case .documentTitle:
             style.alignment = .center
             style.paragraphSpacing = 24
-            applyTrait(.boldFontMask, to: document, range: item.range)
-            uppercaseRange(document, range: item.range)
+            applyTrait(.boldFontMask, to: document, range: currentRange)
+            uppercaseRange(document, range: currentRange)
+            document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             
         case .intro:
             style.alignment = .left
-            style.firstLineHeadIndent = 0
+            document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             
         case .heading:
             style.alignment = .left
             style.paragraphSpacingBefore = 18
-            applyTrait(.boldFontMask, to: document, range: item.range)
-            // Ensure Heading doesn't get a number
+            applyTrait(.boldFontMask, to: document, range: currentRange)
+            document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             
         case .body:
-            // HARD NUMBERING INSERTION
-            // We calculate the number for this specific paragraph based on its position in the body list
-            if let order = bodyIndices.firstIndex(of: index) {
-                let paragraphNumber = order + 1
-                let numberString = "\(paragraphNumber).\t"
+            // Detect if this paragraph HAS a number to replace, or is a continuation.
+            // Regex for "1." or "2)"
+            let level1Pattern = "^\\s*(\\d+)[.)]\\s+"
+            // Regex for "(a)" or "a." or "a)"
+            let level2Pattern = "^\\s*\\(?([a-zA-Z])[.)]\\s+"
+            
+            if let match1 = rangeOfPattern(level1Pattern, in: paragraphText) {
+                // LEVEL 1: Numbered Paragraph
+                // 1. Strip the old text number ("1. ")
+                let globalMatchRange = NSRange(location: currentRange.location + match1.location, length: match1.length)
+                document.replaceCharacters(in: globalMatchRange, with: "")
                 
-                // Insert the number string at the start of the range
-                document.insert(NSAttributedString(string: numberString), at: item.range.location)
+                // 2. Apply Native List Style
+                style.headIndent = LegalFormattingDefaults.listHeadIndent
+                style.firstLineHeadIndent = LegalFormattingDefaults.listFirstLineIndent
+                style.textLists = [masterNumberingList]
                 
-                // Adjust paragraph style for hanging indent
+                // Reset sublist context because we hit a new main number
+                currentSubList = nil
+                
+                // Re-calculate range since we shortened the text
+                let newLength = currentRange.length - match1.length
+                let fixRange = NSRange(location: currentRange.location, length: newLength)
+                document.addAttribute(.paragraphStyle, value: style, range: fixRange)
+                
+            } else if let match2 = rangeOfPattern(level2Pattern, in: paragraphText) {
+                // LEVEL 2: Sub-paragraph
+                // 1. Strip the old text marker ("(a) ")
+                let globalMatchRange = NSRange(location: currentRange.location + match2.location, length: match2.length)
+                document.replaceCharacters(in: globalMatchRange, with: "")
+                
+                // 2. Create or Reuse Sublist
+                // In legal docs, sublists usually reset per paragraph.
+                // However, if we are going backwards, we can't easily know the "parent".
+                // Strategy: Use a generic alpha list.
+                if currentSubList == nil {
+                    if #available(macOS 14.0, *) {
+                        currentSubList = NSTextList(markerFormat: .lowercaseLatin, options: 0)
+                    } else {
+                        // Fallback to decimal or roman if lowercaseLatin is unavailable
+                        currentSubList = NSTextList(markerFormat: .decimal, options: 0)
+                    }
+                    // Note: NSTextList does not render parentheses; this will typically appear as "a.".
+                }
+                
+                style.headIndent = LegalFormattingDefaults.listHeadIndent + 36.0 // Indent further
+                style.firstLineHeadIndent = LegalFormattingDefaults.listHeadIndent
+                // Nesting: Root -> Sub
+                style.textLists = [masterNumberingList, currentSubList!]
+                
+                let newLength = currentRange.length - match2.length
+                let fixRange = NSRange(location: currentRange.location, length: newLength)
+                document.addAttribute(.paragraphStyle, value: style, range: fixRange)
+                
+            } else {
+                // CONTINUATION PARAGRAPH (No number detected)
+                // Just align it with the text of the numbered items
                 style.alignment = .justified
-                style.headIndent = LegalFormattingDefaults.hangingIndent
-                style.firstLineHeadIndent = 0
-                style.tabStops = [NSTextTab(textAlignment: .left, location: LegalFormattingDefaults.hangingIndent, options: [:])]
+                style.headIndent = LegalFormattingDefaults.listHeadIndent
+                style.firstLineHeadIndent = LegalFormattingDefaults.listHeadIndent
+                // DO NOT add textLists, so it has no number but looks aligned
+                document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             }
             
         case .quote:
             style.alignment = .left
-            style.headIndent = LegalFormattingDefaults.hangingIndent
-            style.firstLineHeadIndent = LegalFormattingDefaults.hangingIndent
+            style.headIndent = LegalFormattingDefaults.listHeadIndent * 2
+            style.firstLineHeadIndent = LegalFormattingDefaults.listHeadIndent * 2
+            document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             
         case .statementOfTruth:
             style.alignment = .left
             style.paragraphSpacingBefore = 24
-            applyTrait(.boldFontMask, to: document, range: item.range)
+            applyTrait(.boldFontMask, to: document, range: currentRange)
+            document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             
         case .signature:
             style.alignment = .left
+            document.addAttribute(.paragraphStyle, value: style, range: currentRange)
             
         case .unknown:
             break
         }
-        
-        // The range length might have changed if we inserted text, but since we work backwards,
-        // the `item.range.location` is stable for the *current* item.
-        // However, we must account for the inserted length for the *style* application.
-        // For simplicity in this reverse loop, we calculate the range length dynamically if needed,
-        // or just apply to the range starting at location.
-        // Better safety: Just apply paragraph style to the paragraph covering that location.
-        
-        let safeLength = (document.string as NSString).paragraphRange(for: NSRange(location: item.range.location, length: 0)).length
-        let applyRange = NSRange(location: item.range.location, length: safeLength)
-        
-        document.addAttribute(.paragraphStyle, value: style, range: applyRange)
     }
 }
 
-// MARK: - Helper Functions
+// MARK: - Utilities & Helpers
+
+private func rangeOfPattern(_ pattern: String, in text: String) -> NSRange? {
+    guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { return nil }
+    let range = NSRange(location: 0, length: text.utf16.count)
+    if let match = regex.firstMatch(in: text, options: [], range: range) {
+        return match.range
+    }
+    return nil
+}
 
 private func containsAny(_ text: String, keywords: [String]) -> Bool {
     for k in keywords {
@@ -252,28 +303,16 @@ private func containsAny(_ text: String, keywords: [String]) -> Bool {
 }
 
 private func isHeading(_ text: String) -> Bool {
-    // Detects "A. INTRODUCTION" or "1. BACKGROUND" patterns
     let clean = text.trimmingCharacters(in: .whitespaces)
     guard clean.count < 100 else { return false }
-    
-    // Regex for Heading: Start of line, 1-2 chars (letter/digit), dot, space
-    // e.g. "A. ", "1. ", "IV. "
+    // Detects "A. INTRODUCTION"
     let pattern = "^[A-Za-z0-9IVX]+\\.\\s"
-    if clean.range(of: pattern, options: .regularExpression) != nil {
-        // It looks like a heading. Ensure it's not just a numbered paragraph we haven't processed yet.
-        // Usually headings are Uppercase or Title Case.
-        let upperCount = clean.filter { $0.isUppercase }.count
-        if Double(upperCount) / Double(clean.count) > 0.4 { return true }
-    }
-    return false
+    return rangeOfPattern(pattern, in: clean) != nil
 }
 
 private func boldImportantHeaderLines(in document: NSMutableAttributedString, range: NSRange) {
-    let text = (document.string as NSString).substring(with: range)
-    let lower = text.lowercased()
-    
-    // Bold specific keywords in the header
-    if lower.contains("in the") || lower.contains("witness statement") || lower.contains("between") {
+    let text = (document.string as NSString).substring(with: range).lowercased()
+    if text.contains("in the") || text.contains("witness statement") || text.contains("between") {
         applyTrait(.boldFontMask, to: document, range: range)
     }
 }
@@ -297,13 +336,10 @@ private func applyBaseFontFamily(to document: NSMutableAttributedString, in rang
     document.enumerateAttribute(.font, in: range, options: []) { value, subrange, _ in
         let currentFont = (value as? NSFont) ?? NSFont.systemFont(ofSize: pointSize)
         var newFont = manager.convert(currentFont, toFamily: familyName)
-        
-        // Ensure size
         let desc = newFont.fontDescriptor.withSize(pointSize)
         if let sized = NSFont(descriptor: desc, size: pointSize) {
             newFont = sized
         }
-        
         document.removeAttribute(.font, range: subrange)
         document.addAttribute(.font, value: newFont, range: subrange)
     }
@@ -329,3 +365,4 @@ private func insertGeneratedHeader(to document: NSMutableAttributedString, metad
     let attr = NSMutableAttributedString(string: headerText)
     document.insert(attr, at: 0)
 }
+

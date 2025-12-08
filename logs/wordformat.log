@@ -26,3 +26,84 @@
 [2025-12-08 17:50:00.256][AI] AI meta chunk recv 2054 bytes
 [2025-12-08 17:50:00.258][AI] AI chunk 160-200 classified 40
 [2025-12-08 17:50:00.268][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:50:17.272][AI] AI meta chunk recv 2054 bytes
+[2025-12-08 17:50:17.273][AI] AI chunk 200-240 classified 40
+[2025-12-08 17:50:17.277][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:50:33.885][AI] AI meta chunk recv 2044 bytes
+[2025-12-08 17:50:33.887][AI] AI chunk 240-280 classified 40
+[2025-12-08 17:50:33.903][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 17:51:01.423][AI] AI meta chunk recv 2061 bytes
+[2025-12-08 17:51:01.427][AI] AI chunk 280-320 classified 40
+[2025-12-08 17:51:01.435][AI] AI meta chunk send (23 items, model gpt-5-mini)
+[2025-12-08 17:51:14.496][AI] AI meta chunk recv 1520 bytes
+[2025-12-08 17:51:14.498][AI] AI chunk 320-343 classified 23
+[2025-12-08 17:51:14.508][AI] AI chunk 0-40 sending with model gpt-5-mini
+[2025-12-08 17:51:40.405][AI] AI chunk 0-40 response 953 bytes
+[2025-12-08 17:51:40.412][AI] AI chunk 40-80 sending with model gpt-5-mini
+[2025-12-08 17:52:14.043][AI] AI chunk 40-80 response 1598 bytes
+[2025-12-08 17:52:14.044][AI] AI chunk 80-120 sending with model gpt-5-mini
+[2025-12-08 17:52:44.000][AI] AI chunk 80-120 response 1382 bytes
+[2025-12-08 17:52:44.002][AI] AI chunk 120-160 sending with model gpt-5-mini
+[2025-12-08 17:52:58.148][AI] AI chunk 120-160 response 1727 bytes
+[2025-12-08 17:52:58.150][AI] AI chunk 160-200 sending with model gpt-5-mini
+[2025-12-08 17:53:25.158][AI] AI chunk 160-200 response 1465 bytes
+[2025-12-08 17:53:25.161][AI] AI chunk 200-240 sending with model gpt-5-mini
+[2025-12-08 17:53:44.188][AI] AI chunk 200-240 response 1441 bytes
+[2025-12-08 17:53:44.189][AI] AI chunk 240-280 sending with model gpt-5-mini
+[2025-12-08 17:54:14.359][AI] AI chunk 240-280 response 1513 bytes
+[2025-12-08 17:54:14.361][AI] AI chunk 280-320 sending with model gpt-5-mini
+[2025-12-08 17:54:38.911][AI] AI chunk 280-320 response 1729 bytes
+[2025-12-08 17:54:38.913][AI] AI chunk 320-360 sending with model gpt-5-mini
+[2025-12-08 17:55:08.273][AI] AI chunk 320-360 response 1585 bytes
+[2025-12-08 17:55:08.275][AI] AI chunk 360-400 sending with model gpt-5-mini
+[2025-12-08 17:55:44.958][AI] AI chunk 360-400 response 1393 bytes
+[2025-12-08 17:55:44.960][AI] AI chunk 400-411 sending with model gpt-5-mini
+[2025-12-08 17:55:52.417][AI] AI chunk 400-411 response 1053 bytes
+[2025-12-08 17:55:52.419][AI] AI paragraph levels collected: 299 of 411
+[2025-12-08 17:55:52.428][AI] AI paragraph types: 343
+[2025-12-08 17:55:52.436][AI] AI paragraph levels: 299
+[2025-12-08 17:55:52.444][FORMAT] Applying formatting…
+[2025-12-08 17:55:52.451][FORMAT] Formatting start. Total length: 125049
+[2025-12-08 17:55:52.458][FORMAT] Split index at 894
+[2025-12-08 17:55:52.461][FORMAT] Header length: 894, body length: 124155
+[2025-12-08 17:55:52.464][FORMAT] Body paragraphs (approx): 383
+[2025-12-08 17:55:52.466][FORMAT] Para level 1 heading:false truth:false text: I, Kevin Hastings of 21 Corbet Close, Wallington SM6 7GB will say as follows:
+[2025-12-08 17:55:52.468][FORMAT] Para level 1 heading:false truth:false text: I have served as the Chair of the 8 Artillery Row Residents Association since its inception until present day. Although 
+[2025-12-08 17:55:52.472][FORMAT] Para level 1 heading:false truth:false text: The facts and matter set out in this statement are within my own knowledge unless otherwise stated, and I believe them t
+[2025-12-08 17:55:52.474][FORMAT] Para level 1 heading:false truth:false text: WITNESS STATEMENT OF KEVIN HASTINGS
+[2025-12-08 17:55:52.476][FORMAT] Para level 1 heading:false truth:false text: I, Kevin Hastings of 21 Corbet Close, Wallington SM6 7GB will say as follows:
+[2025-12-08 17:55:52.479][FORMAT] Para level 1 heading:false truth:false text: I have served as the Chair of the 8 Artillery Row Residents Association since its inception until presentday. Although I
+[2025-12-08 17:55:52.481][FORMAT] Para level 1 heading:false truth:false text: The facts and matter set out in this statement are within my own knowledge unless otherwise stated, and I believe them t
+[2025-12-08 17:55:52.484][FORMAT] Para level 0 heading:true truth:false text: A. INTRODUCTION AND CAPACITY
+[2025-12-08 17:55:52.486][FORMAT] Para level 1 heading:false truth:false text: I lived at 8 Artillery Row with my family from April 2016 until May 2024. I helped to set up, and have since served as C
+[2025-12-08 17:55:52.487][FORMAT] Para level 1 heading:false truth:false text: I make this statement on behalf of the Applicants. The facts and matters set out are within my own knowledge, or are der
+[2025-12-08 17:55:52.489][FORMAT] Para level 1 heading:false truth:false text: This statement supports the Applicants’ challenge to the service charges demanded for the years 2017–2024. It addresses,
+[2025-12-08 17:55:52.491][FORMAT] Para level 1 heading:false truth:false text: The statement is intended to be read alongside the Applicants’ Scott Schedule (filed on 2 September 2025) and Statement 
+[2025-12-08 17:55:52.493][FORMAT] Para level 1 heading:false truth:false text: Category
+[2025-12-08 17:55:52.495][FORMAT] Para level 1 heading:false truth:false text: Reason for reduction
+[2025-12-08 17:55:52.497][FORMAT] Para level 1 heading:false truth:false text: Period of overcharge/double charge
+[2025-12-08 17:55:52.499][FORMAT] Para level 1 heading:false truth:false text: Amount claimed
+[2025-12-08 17:55:52.503][FORMAT] Para level 1 heading:false truth:false text: Heat and Hot water
+[2025-12-08 17:55:52.506][FORMAT] Para level 1 heading:false truth:false text: Duplicated maintenance/admin costs
+[2025-12-08 17:55:52.509][FORMAT] Para level 1 heading:false truth:false text: 2017 to date
+[2025-12-08 17:55:52.510][FORMAT] Para level 1 heading:false truth:false text: £10,000 (or whatever the figure is)
+[2025-12-08 17:55:52.512][FORMAT] Para level 1 heading:false truth:false text: Electricity charges
+[2025-12-08 17:55:52.514][FORMAT] Para level 1 heading:false truth:false text: Double charging of communal supply
+[2025-12-08 17:55:52.516][FORMAT] Para level 1 heading:false truth:false text: 2015 to date
+[2025-12-08 17:55:52.518][FORMAT] Para level 1 heading:false truth:false text: £1.3m
+[2025-12-08 17:55:52.519][FORMAT] Para level 1 heading:false truth:false text: AES Systems plant or Heat Interface Maintenance
+[2025-12-08 17:55:52.521][FORMAT] Level counts -> level0:5 level1:311 level2:0 level3:0
+[2025-12-08 17:55:52.523][DOCX] Saved formatted DOCX to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx
+[2025-12-08 17:55:52.524][PATCH] Target builder using splitIndex 894
+[2025-12-08 17:55:52.526][PATCH] Built 288 numbering targets from document paragraphs. Sample: [31:0] [32:0] [33:0] [35:0] [36:0] [37:0] [39:0] [40:0] [41:2] [42:0]
+[2025-12-08 17:55:52.527][PATCH] Patcher will apply numbering to 288 paragraphs
+[2025-12-08 17:55:52.529][PATCH] Patcher: start for Draft Witness Statement of KH 2025.12.07_UKLegal.docx with 288 targets
+[2025-12-08 17:55:52.552][PATCH] Patcher: unzip ok to /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/tmp/wordformat-patch-C05437AE-7913-44F7-A3D7-EE330CFF9C8D
+[2025-12-08 17:55:52.552][PATCH] Patcher: numbering.xml missing, creating…
+[2025-12-08 17:55:52.555][PATCH] Patcher: added rel for numbering.xml
+[2025-12-08 17:55:52.557][PATCH] Patcher: added content-type override for numbering.xml
+[2025-12-08 17:55:52.559][PATCH] Patcher: injecting numbering into document.xml
+[2025-12-08 17:55:52.567][PATCH] Patcher: inject complete
+[2025-12-08 17:55:52.630][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
+[2025-12-08 17:55:52.630][PATCH] Patcher: replaced original DOCX with patched version
+[2025-12-08 17:55:52.696][PATCH] Patcher completed successfully

@@ -9,7 +9,6 @@ import SwiftUI
 import AppKit
 import UniformTypeIdentifiers
 
-/// Metadata required to build the UK legal header for the formatted document.
 struct LegalHeaderMetadata {
     var tribunalName: String
     var caseReference: String
@@ -18,98 +17,82 @@ struct LegalHeaderMetadata {
 }
 
 struct ContentView: View {
-    // MARK: - Header input state
     @State private var caseReference: String = ""
     @State private var tribunalName: String = ""
     @State private var applicantName: String = ""
     @State private var respondentName: String = ""
-
-    // MARK: - UI state
+    @State private var openAIKey: String = "" // NEW
+    
     @State private var status: String = "Select a DOCX file to format."
     @State private var isProcessing: Bool = false
 
-    // MARK: - Body
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("UK Legal DOCX Formatter")
+            Text("UK Legal DOCX Formatter (Markdown Engine)")
                 .font(.title)
                 .bold()
 
             GroupBox("Header metadata") {
                 VStack(alignment: .leading, spacing: 8) {
-                    TextField("Tribunal name (e.g. Employment Tribunal London)", text: $tribunalName)
-                    TextField("Case reference (e.g. 2401234/2025)", text: $caseReference)
-                    TextField("Applicant name (e.g. John Smith)", text: $applicantName)
-                    TextField("Respondent name (e.g. ACME Ltd)", text: $respondentName)
+                    TextField("Tribunal name", text: $tribunalName)
+                    TextField("Case reference", text: $caseReference)
+                    TextField("Applicant", text: $applicantName)
+                    TextField("Respondent", text: $respondentName)
                 }
                 .textFieldStyle(.roundedBorder)
+            }
+            
+            // NEW: AI Section
+            GroupBox("AI Analysis (Optional)") {
+                SecureField("OpenAI API Key (sk-...)", text: $openAIKey)
+                    .textFieldStyle(.roundedBorder)
+                Text("If provided, AI will be used to intelligently structure the document before formatting.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Button {
                 openAndFormatDocx()
             } label: {
                 if isProcessing {
-                    ProgressView()
-                        .controlSize(.small)
-                    Text("Processing…")
+                    ProgressView().controlSize(.small)
+                    Text("Processing...")
                 } else {
-                    Text("Open DOCX and apply UK legal format")
+                    Text("Open DOCX and Format")
                 }
             }
-            .keyboardShortcut(.defaultAction)
             .disabled(isProcessing)
 
             Divider()
 
-            Text("Status:")
-                .font(.headline)
             ScrollView {
                 Text(status)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 4)
                     .textSelection(.enabled)
             }
-
-            Spacer()
         }
         .padding()
-        .frame(minWidth: 600, minHeight: 400)
+        .frame(minWidth: 600, minHeight: 500)
     }
 
-    // MARK: - Actions
-
-    /// Presents an open panel to choose a `.docx` file and triggers formatting.
     private func openAndFormatDocx() {
         let panel = NSOpenPanel()
-        // Prefer a specific UTType if available; otherwise fall back gracefully.
-        if let wordType = UTType(filenameExtension: "docx") {
-            panel.allowedContentTypes = [wordType]
-        } else {
-            // If UTType resolution fails for some reason, allow selecting any file
-            // and rely on loadDocx throwing a clear error for non-DOCX content.
-            panel.allowedContentTypes = []
-        }
+        if let type = UTType(filenameExtension: "docx") { panel.allowedContentTypes = [type] }
         panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = false
-
+        
         if panel.runModal() == .OK, let url = panel.url {
-            status = "Selected file: \(url.lastPathComponent)\nProcessing…"
+            status = "Processing \(url.lastPathComponent)..."
             isProcessing = true
-
+            
             Task {
                 await processDocx(at: url)
             }
-        } else {
-            status = "File selection cancelled."
         }
     }
 
-    /// Loads, formats, and saves the selected DOCX file.
-    /// This method runs on the main actor because it updates view state.
     @MainActor
     private func processDocx(at url: URL) async {
         defer { isProcessing = false }
-
         do {
             let header = LegalHeaderMetadata(
                 tribunalName: tribunalName,
@@ -118,32 +101,31 @@ struct ContentView: View {
                 respondentName: respondentName
             )
 
-            // 1. Load DOCX into attributed string from the ORIGINAL file (read-only)
             let mutableDoc = try loadDocx(from: url)
+            
+            // AI Analysis Step
+            var analysisResult: AnalysisResult? = nil
+            if !openAIKey.isEmpty {
+                status = "Analysing structure with AI..."
+                let aiService = OpenAIService(apiKey: openAIKey)
+                // Extract plain text for AI
+                let plainText = mutableDoc.string
+                do {
+                    let ranges = try await aiService.analyseDocumentStructure(text: plainText)
+                    analysisResult = AnalysisResult(classifiedRanges: ranges)
+                } catch {
+                    status += "\nAI Error: \(error.localizedDescription). Falling back to standard logic."
+                }
+            }
 
-            // 2. (Optional) Call OpenAI here to analyse structure and return
-            //    JSON describing headings, table ranges, etc.
-            //
-            //    let analysis = try await analyseWithOpenAI(text: mutableDoc.string)
-            //
-            //    For now, we just proceed without it.
+            // Reconstruction
+            status += "\nRebuilding document..."
+            applyUKLegalFormatting(to: mutableDoc, header: header, analysis: analysisResult)
 
-            // 3. Apply formatting WITHOUT changing body text content
-            applyUKLegalFormatting(to: mutableDoc, header: header, analysis: nil)
-
-            // 4. Save as NEW DOCX next to original so the original is always preserved
             let outputURL = makeOutputURL(from: url)
             try saveDocx(mutableDoc, to: outputURL)
 
-            status = """
-            Formatting completed successfully.
-
-            Original file (unchanged):
-            \(url.path)
-
-            New formatted copy:
-            \(outputURL.path)
-            """
+            status = "Success!\nSaved to: \(outputURL.path)"
         } catch {
             status = "Error: \(error.localizedDescription)"
         }

@@ -335,21 +335,34 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
     let ns = doc.string as NSString
     let (_, bodyStartPara) = findBodyStartIndexWithParaIndex(in: doc.string, analysis: analysis)
 
-    // Patterns for level detection (improved)
-    let level1Pattern = "^\\s*(?:\\([a-zA-Z]\\)|[a-zA-Z][).])\\s+"
-    let level2Pattern = "^\\s*(?:\\([ivxIVX]+\\)|[ivxIVX]+[).])\\s+"
+    // Improved patterns for level detection (more flexible - allow optional space after marker)
+    // Level 1 (subparagraph): "(a)", "a)", "a." - single letter
+    let level1Patterns = [
+        "^\\s*\\([a-zA-Z]\\)\\s*",      // "(a)" or "(a) "
+        "^\\s*[a-zA-Z]\\)\\s*",          // "a)" or "a) "
+        "^\\s*[a-zA-Z]\\.\\s+"           // "a. " (letter-dot requires space to avoid matching abbreviations)
+    ]
+
+    // Level 2 (sub-subparagraph): "(i)", "i)", "i." - roman numerals
+    let level2Patterns = [
+        "^\\s*\\([ivxIVX]+\\)\\s*",      // "(i)" or "(ii)"
+        "^\\s*[ivxIVX]+\\)\\s*",          // "i)" or "ii)"
+        "^\\s*[ivxIVX]+\\.\\s+"           // "i. " (requires space)
+    ]
 
     var paraIndex = 0
-    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, _, _, _ in
+    var sampleLogged = 0
+
+    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, substringRange, _, _ in
         defer { paraIndex += 1 }
         guard paraIndex >= bodyStartPara else { return }
-        
+
         let text = (substring ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         if text.isEmpty { return }
 
         // Skip non-numbered types
         if let t = aiTypes[paraIndex], nonNumberedTypes.contains(t) { return }
-        
+
         // Skip Heuristics
         if text.lowercased().contains("statement of truth") || isHeading(text) { return }
 
@@ -358,22 +371,48 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
         if let aiLevel = aiLevels[paraIndex] {
             level = aiLevel
         } else {
-            // Updated Regex + indent heuristics
-            if text.range(of: level2Pattern, options: .regularExpression) != nil {
+            // Check level 2 first (roman numerals) - more specific
+            let isLevel2 = level2Patterns.contains { pattern in
+                text.range(of: pattern, options: .regularExpression) != nil
+            }
+
+            // Check level 1 (letters) - but exclude if it's actually a roman numeral
+            let isLevel1 = !isLevel2 && level1Patterns.contains { pattern in
+                text.range(of: pattern, options: .regularExpression) != nil
+            }
+
+            if isLevel2 {
                 level = 2
-            } else if text.range(of: level1Pattern, options: .regularExpression) != nil {
+            } else if isLevel1 {
                 level = 1
             } else {
-                // indent-based fallback: inspect paragraph style if available
-                if let style = doc.attribute(.paragraphStyle, at: ns.rangeOfComposedCharacterSequence(at: max(0, ns.range(of: text).location)).location, effectiveRange: nil) as? NSParagraphStyle {
-                    if style.headIndent >= 80 { level = 2 }
-                    else if style.headIndent >= 36 { level = 1 }
+                // Fallback: check indentation from paragraph style
+                if substringRange.location < doc.length {
+                    let safeLocation = min(substringRange.location, doc.length - 1)
+                    if let style = doc.attribute(.paragraphStyle, at: safeLocation, effectiveRange: nil) as? NSParagraphStyle {
+                        if style.headIndent >= 72 || style.firstLineHeadIndent >= 72 {
+                            level = 2
+                        } else if style.headIndent >= 36 || style.firstLineHeadIndent >= 36 {
+                            level = 1
+                        }
+                    }
                 }
             }
         }
-        
-        // We capture prefix for content matching
-        targets.append(.init(paragraphIndex: paraIndex, level: level, textPrefix: String(text.prefix(50))))
+
+        // Log samples for debugging
+        if sampleLogged < 30 && level > 0 {
+            Logger.shared.log("Target para \(paraIndex) level \(level): \(text.prefix(60))", category: "PATCH")
+            sampleLogged += 1
+        }
+
+        // We capture longer prefix for content matching (80 chars instead of 50)
+        targets.append(.init(paragraphIndex: paraIndex, level: level, textPrefix: String(text.prefix(80))))
     }
+
+    // Log level distribution
+    let levelCounts = Dictionary(grouping: targets, by: { $0.level }).mapValues { $0.count }
+    Logger.shared.log("Target levels: \(levelCounts)", category: "PATCH")
+
     return targets
 }

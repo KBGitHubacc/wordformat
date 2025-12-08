@@ -504,80 +504,159 @@ private func baseFontWithExistingTraits(baseFont: NSFont, existing: NSFont?) -> 
 
 // MARK: - Numbering targets extraction
 
-/// Build numbering targets from the fully formatted document, using AI paragraph levels when available.
-/// IMPORTANT: The doc parameter here is the FORMATTED document, which may have different paragraph
-/// structure than the original. We need to track paragraph indices correctly.
-func buildNumberingTargets(from doc: NSAttributedString, analysis: AnalysisResult?) -> [DocxNumberingPatcher.NumberingTarget] {
-    let ns = doc.string as NSString
-    var targets: [DocxNumberingPatcher.NumberingTarget] = []
-    let aiLevels = analysis?.paragraphLevels ?? [:]
+/// Build numbering targets from analysis of the document.
+/// This version works with the original document structure for XML patching.
+func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: AnalysisResult?) -> [DocxNumberingPatcher.NumberingTarget] {
     let aiTypes = analysis?.paragraphTypes ?? [:]
+    let aiLevels = analysis?.paragraphLevels ?? [:]
 
-    // Find split point in the formatted document
-    let (splitCharIndex, _) = findBodyStartIndexWithParaIndex(in: doc.string, analysis: analysis)
-    Logger.shared.log("Target builder using splitCharIndex \(splitCharIndex)", category: "PATCH")
+    Logger.shared.log("Building numbering targets from analysis...", category: "PATCH")
+    Logger.shared.log("AI types available: \(aiTypes.count), AI levels available: \(aiLevels.count)", category: "PATCH")
 
     // Non-numbered paragraph types
     let nonNumberedTypes: Set<LegalParagraphType> = [.headerMetadata, .documentTitle, .intro, .heading, .statementOfTruth, .signature, .quote]
 
-    var xmlParaIndex = 0  // Index for the XML patcher (counts all paragraphs in output)
-    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, range, _, _ in
-        defer { xmlParaIndex += 1 }
+    var targets: [DocxNumberingPatcher.NumberingTarget] = []
+    let ns = doc.string as NSString
 
-        // Skip paragraphs before split point (header area)
-        guard range.location >= splitCharIndex else { return }
+    // Find where body content starts
+    var bodyStartParaIndex = 0
+    var foundIntro = false
+
+    // First pass: find where body content starts
+    var paraIndex = 0
+    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, _, _, stop in
+        let text = (substring ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Check AI classification first
+        if let aiType = aiTypes[paraIndex] {
+            if aiType == .body || aiType == .heading {
+                // First body/heading paragraph after header section
+                if !foundIntro || aiType == .body {
+                    bodyStartParaIndex = paraIndex
+                    stop.pointee = true
+                    Logger.shared.log("AI-guided body start at paragraph \(paraIndex): \(text.prefix(50))", category: "PATCH")
+                    return
+                }
+            }
+            if aiType == .intro {
+                foundIntro = true
+            }
+        }
+
+        // Fallback: Look for section heading pattern like "A. INTRODUCTION"
+        if text.range(of: "^[A-Z]+\\.\\s+[A-Z]", options: .regularExpression) != nil {
+            bodyStartParaIndex = paraIndex
+            stop.pointee = true
+            Logger.shared.log("Heuristic body start at paragraph \(paraIndex): \(text.prefix(50))", category: "PATCH")
+            return
+        }
+
+        // Fallback: Look for "will say as follows"
+        if text.lowercased().contains("will say as follows") {
+            foundIntro = true
+        } else if foundIntro {
+            // First paragraph after intro
+            let isLikelyBody = !text.lowercased().contains("witness statement") &&
+                               !text.lowercased().contains("between") &&
+                               !text.isEmpty
+            if isLikelyBody {
+                bodyStartParaIndex = paraIndex
+                stop.pointee = true
+                Logger.shared.log("Post-intro body start at paragraph \(paraIndex): \(text.prefix(50))", category: "PATCH")
+                return
+            }
+        }
+
+        paraIndex += 1
+    }
+
+    Logger.shared.log("Body starts at paragraph index \(bodyStartParaIndex)", category: "PATCH")
+
+    // Second pass: identify which paragraphs should be numbered
+    paraIndex = 0
+    var sampleLogged = 0
+
+    ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, _, _, _ in
+        defer { paraIndex += 1 }
+
+        // Skip paragraphs before body start
+        guard paraIndex >= bodyStartParaIndex else { return }
 
         let text = (substring ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Skip empty paragraphs
         if text.isEmpty { return }
 
-        // Check AI type for this paragraph (if available)
-        // Note: We need to map back to original paragraph index if AI data is indexed differently
-        // For now, check using pattern-based detection as primary
-        let aiType = aiTypes[xmlParaIndex]
+        // Check AI classification
+        let aiType = aiTypes[paraIndex]
 
-        // Determine if this is a non-numbered paragraph type
-        let isHeadingPara = isHeading(text)
-        let isIntro = text.lowercased().contains("will say as follows")
-        let isTitle = text.uppercased().contains("WITNESS STATEMENT OF")
-        let isStatementOfTruth = text.lowercased().contains("statement of truth")
-
-        // Skip non-numbered types based on both AI and heuristics
+        // Skip non-numbered types based on AI
         if let t = aiType, nonNumberedTypes.contains(t) {
-            Logger.shared.log("Skipping para \(xmlParaIndex) - AI type: \(t.rawValue)", category: "PATCH")
-            return
-        }
-        if isHeadingPara || isIntro || isTitle || isStatementOfTruth {
-            Logger.shared.log("Skipping para \(xmlParaIndex) - heuristic: heading=\(isHeadingPara) intro=\(isIntro) title=\(isTitle) truth=\(isStatementOfTruth)", category: "PATCH")
-            return
-        }
-
-        // Get paragraph style to check for existing textLists (indicates numbered paragraph)
-        let attrStyle = doc.attribute(.paragraphStyle, at: range.location, effectiveRange: nil) as? NSParagraphStyle
-        let textLists = attrStyle?.textLists ?? []
-        let indent = attrStyle?.headIndent ?? 0
-
-        // Only add to targets if paragraph has textLists (was marked for numbering by formatter)
-        // OR if indent suggests it should be numbered
-        guard !textLists.isEmpty || indent >= 20 else {
-            Logger.shared.log("Skipping para \(xmlParaIndex) - no textLists and low indent (\(indent))", category: "PATCH")
+            if sampleLogged < 10 {
+                Logger.shared.log("Skip para \(paraIndex) - AI type: \(t.rawValue) - \(text.prefix(40))", category: "PATCH")
+                sampleLogged += 1
+            }
             return
         }
 
-        // Determine level from textLists count or AI
-        var level = textLists.count - 1  // textLists array length indicates nesting depth
-        if level < 0 {
-            // Fallback to AI level or indent-based detection
-            level = aiLevels[xmlParaIndex] ?? 0
-            if level == 0 {
-                if indent >= 72 { level = 2 }
-                else if indent >= 48 { level = 1 }
-                else { level = 0 }
+        // Skip based on heuristics
+        let isHeading = text.range(of: "^[A-Z0-9]+\\.\\s+[A-Z]", options: .regularExpression) != nil
+        let isIntro = text.lowercased().contains("will say as follows")
+        let isTitle = text.uppercased().hasPrefix("WITNESS STATEMENT")
+        let isStatementOfTruth = text.lowercased().contains("statement of truth")
+        let isSignature = text.lowercased().hasPrefix("signed:") || text.lowercased().hasPrefix("dated:")
+
+        if isHeading || isIntro || isTitle || isStatementOfTruth || isSignature {
+            if sampleLogged < 10 {
+                Logger.shared.log("Skip para \(paraIndex) - heuristic: heading=\(isHeading) intro=\(isIntro) title=\(isTitle) - \(text.prefix(40))", category: "PATCH")
+                sampleLogged += 1
+            }
+            return
+        }
+
+        // Skip table cell content (usually short fragments)
+        // Table cells from NSAttributedString are typically very short and don't make sense as numbered paragraphs
+        let words = text.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+        if words.count <= 3 && !text.contains(".") {
+            // Likely a table cell or header fragment
+            if sampleLogged < 10 {
+                Logger.shared.log("Skip para \(paraIndex) - likely table cell: \(text.prefix(40))", category: "PATCH")
+                sampleLogged += 1
+            }
+            return
+        }
+
+        // Determine numbering level
+        var level = 0
+
+        // First check AI-provided level
+        if let aiLevel = aiLevels[paraIndex] {
+            level = aiLevel
+        } else {
+            // Fallback to pattern detection
+            // Level 2: sub-sub-paragraph (i), (ii), (iii)
+            if text.range(of: "^\\s*\\(?[ivxIVX]+\\)", options: .regularExpression) != nil {
+                level = 2
+            }
+            // Level 1: sub-paragraph (a), (b), (c)
+            else if text.range(of: "^\\s*\\(?[a-zA-Z]\\)", options: .regularExpression) != nil {
+                level = 1
+            }
+            // Level 0: main paragraph
+            else {
+                level = 0
             }
         }
 
-        targets.append(.init(paragraphIndex: xmlParaIndex, level: max(0, level)))
+        if sampleLogged < 20 {
+            Logger.shared.log("Number para \(paraIndex) level \(level): \(text.prefix(60))", category: "PATCH")
+            sampleLogged += 1
+        }
+
+        // Include text prefix for content-based matching in patcher
+        let textPrefix = String(text.prefix(80))
+        targets.append(.init(paragraphIndex: paraIndex, level: level, textPrefix: textPrefix))
     }
 
     if !targets.isEmpty {
@@ -586,7 +665,14 @@ func buildNumberingTargets(from doc: NSAttributedString, analysis: AnalysisResul
     } else {
         Logger.shared.log("No numbering targets built", category: "PATCH")
     }
+
     return targets
+}
+
+// Keep the old function for backward compatibility but mark as unused
+@available(*, deprecated, message: "Use buildNumberingTargetsFromAnalysis instead")
+func buildNumberingTargets(from doc: NSAttributedString, analysis: AnalysisResult?) -> [DocxNumberingPatcher.NumberingTarget] {
+    return buildNumberingTargetsFromAnalysis(doc: doc, analysis: analysis)
 }
 
 /// Bold variant of a given font, preserving family where possible.

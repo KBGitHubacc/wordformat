@@ -266,6 +266,7 @@ struct OpenAIService {
         - The "title" (WITNESS STATEMENT OF...) should NEVER be "body"
         - The "intro" (I, Name, will say...) should NEVER be "body"
         - Section headings (A. INTRODUCTION, B. FACTS) should be "heading", not "body"
+        - Anything in a table format NEVER be "body"
         - Only actual narrative paragraphs should be "body"
 
         Return only JSON: {"classifications":[{"id":0,"type":"body"}, ...]}
@@ -389,16 +390,17 @@ struct OpenAIService {
 
         UK Legal Document Numbering Levels:
         - level 0 = main numbered paragraph (numbered as 1., 2., 3., etc.)
-        - level 1 = subparagraph (numbered as (a), (b), (c), etc. or a), b), c))
+        - level 1 = subparagraph (numbered as (a), (b), (c), etc. or a), b), c) or a. b. c. etc.
         - level 2 = sub-subparagraph (numbered as (i), (ii), (iii), etc. or i), ii), iii))
 
         RULES:
-        1. Look for existing numbering patterns: "1.", "2.", "(a)", "a)", "(i)", "i)" etc.
+        1. Look for existing numbering patterns: "1.", "2.", "(a)", "a)", "a.", "(i)", "i)" etc.
         2. If a paragraph starts with a number followed by period/bracket, it's level 0
-        3. If a paragraph starts with a letter (a-z) in parentheses or followed by ), it's level 1
+        3. If a paragraph starts with a letter (a-z) in parentheses or followed by ) or ., it's level 1
         4. If a paragraph starts with roman numerals (i, ii, iii, iv, v, vi, vii, viii, ix, x), it's level 2
         5. OMIT from the list: headings, titles, intro paragraphs ("will say as follows"), statement of truth
         6. If unsure and paragraph looks like narrative content, default to level 0
+        7. If a sentence ending with a ":" it usually means a level 1 subparagraph is following.
 
         Paragraphs:
         \(joined)

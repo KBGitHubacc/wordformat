@@ -7,13 +7,27 @@
 
 import Foundation
 
-/// Placeholder for AI-driven document analysis.
-/// Extend with additional fields as needed.
-struct AnalysisResult {
-    /// Ranges in the document that should be styled as headings.
-    /// These are NSRange in the coordinate space of the full attributed string.
-    var headingRanges: [NSRange] = []
+/// Defines the types of content found in a UK Legal document.
+enum LegalParagraphType: String, Codable {
+    case headerMetadata // The case no, parties, etc.
+    case documentTitle  // "WITNESS STATEMENT OF..."
+    case intro          // "I, [Name], will say..."
+    case heading        // "A. INTRODUCTION"
+    case body           // Standard numbered paragraph
+    case quote          // Block quote (indented, no number)
+    case statementOfTruth // "I believe that the facts..."
+    case signature      // Date and signature lines
+    case unknown
+}
 
-    /// Ranges in the document that represent text tables to convert to real tables.
-    var tableRanges: [NSRange] = []
+/// A container for the AI analysis of the document structure.
+struct AnalysisResult {
+    /// A list of ranges and their determined type.
+    /// The formatter will iterate through these and apply the correct style.
+    var classifiedRanges: [FormattedRange] = []
+    
+    struct FormattedRange {
+        var range: NSRange
+        var type: LegalParagraphType
+    }
 }

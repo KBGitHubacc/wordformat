@@ -260,3 +260,104 @@
 [2025-12-08 18:35:00.984][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
 [2025-12-08 18:35:00.984][PATCH] Patcher: replaced original DOCX with patched version
 [2025-12-08 18:35:01.053][PATCH] Patcher completed successfully
+
+=== wordformat run 2025-12-08 18:12:31 +0000 ===
+
+[2025-12-08 19:12:31.760][UI] Selected file: /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07.docx
+[2025-12-08 19:12:31.780][DOCX] Loaded DOCX for analysis. Length 125049 chars
+[2025-12-08 19:12:31.786][LOG] Log file path: /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/Downloads/Developer/wordformat/logs/wordformat.log
+[2025-12-08 19:12:31.796][AI] AI style-aware: 343 non-empty paragraphs to classify
+[2025-12-08 19:12:31.805][AI] Total paragraphs (including empty): 411
+[2025-12-08 19:12:31.821][AI] Requesting model list…
+[2025-12-08 19:12:33.085][AI] Received AI response (13442 bytes)
+[2025-12-08 19:12:33.096][AI] Model list: ["gpt-4-0613", "gpt-4", "gpt-3.5-turbo", "gpt-5.1-codex-max", "gpt-5.1-2025-11-13", "gpt-5.1", "gpt-5.1-codex", "gpt-5.1-codex-mini", "davinci-002", "babbage-002", "gpt-3.5-turbo-instruct", "gpt-3.5-turbo-instruct-0914", "dall-e-3", "dall-e-2", "gpt-4-1106-preview", "gpt-3.5-turbo-1106", "tts-1-hd", "tts-1-1106", "tts-1-hd-1106", "text-embedding-3-small", "text-embedding-3-large", "gpt-4-0125-preview", "gpt-4-turbo-preview", "gpt-3.5-turbo-0125", "gpt-4-turbo", "gpt-4-turbo-2024-04-09", "gpt-4o", "gpt-4o-2024-05-13", "gpt-4o-mini-2024-07-18", "gpt-4o-mini", "gpt-4o-2024-08-06", "chatgpt-4o-latest", "gpt-4o-audio-preview", "gpt-4o-realtime-preview", "omni-moderation-latest", "omni-moderation-2024-09-26", "gpt-4o-realtime-preview-2024-12-17", "gpt-4o-audio-preview-2024-12-17", "gpt-4o-mini-realtime-preview-2024-12-17", "gpt-4o-mini-audio-preview-2024-12-17", "o1-2024-12-17", "o1", "gpt-4o-mini-realtime-preview", "gpt-4o-mini-audio-preview", "o3-mini", "o3-mini-2025-01-31", "gpt-4o-2024-11-20", "gpt-4o-search-preview-2025-03-11", "gpt-4o-search-preview", "gpt-4o-mini-search-preview-2025-03-11", "gpt-4o-mini-search-preview", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "o1-pro-2025-03-19", "o1-pro", "gpt-4o-mini-tts", "o3-2025-04-16", "o4-mini-2025-04-16", "o3", "o4-mini", "gpt-4.1-2025-04-14", "gpt-4.1", "gpt-4.1-mini-2025-04-14", "gpt-4.1-mini", "gpt-4.1-nano-2025-04-14", "gpt-4.1-nano", "gpt-image-1", "codex-mini-latest", "o3-pro", "gpt-4o-realtime-preview-2025-06-03", "gpt-4o-audio-preview-2025-06-03", "o3-pro-2025-06-10", "o4-mini-deep-research", "o3-deep-research", "gpt-4o-transcribe-diarize", "o3-deep-research-2025-06-26", "o4-mini-deep-research-2025-06-26", "gpt-5-chat-latest", "gpt-5-2025-08-07", "gpt-5", "gpt-5-mini-2025-08-07", "gpt-5-mini", "gpt-5-nano-2025-08-07", "gpt-5-nano", "gpt-audio-2025-08-28", "gpt-realtime", "gpt-realtime-2025-08-28", "gpt-audio", "gpt-5-codex", "gpt-image-1-mini", "gpt-5-pro-2025-10-06", "gpt-5-pro", "gpt-audio-mini", "gpt-audio-mini-2025-10-06", "gpt-5-search-api", "gpt-realtime-mini", "gpt-realtime-mini-2025-10-06", "sora-2", "sora-2-pro", "gpt-5-search-api-2025-10-14", "gpt-5.1-chat-latest", "gpt-3.5-turbo-16k", "tts-1", "whisper-1", "text-embedding-ada-002"]
+[2025-12-08 19:12:33.108][AI] Selected model: gpt-5-mini
+[2025-12-08 19:12:33.118][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:12:52.487][AI] AI meta chunk recv 2056 bytes
+[2025-12-08 19:12:52.497][AI] AI chunk 0-40 classified 40
+[2025-12-08 19:12:52.509][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:13:12.246][AI] AI meta chunk recv 2013 bytes
+[2025-12-08 19:13:12.251][AI] AI chunk 40-80 classified 40
+[2025-12-08 19:13:12.261][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:13:21.210][AI] AI meta chunk recv 2047 bytes
+[2025-12-08 19:13:21.212][AI] AI chunk 80-120 classified 40
+[2025-12-08 19:13:21.222][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:13:40.682][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 19:13:40.684][AI] AI chunk 120-160 classified 40
+[2025-12-08 19:13:40.694][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:14:08.618][AI] AI meta chunk recv 2058 bytes
+[2025-12-08 19:14:08.620][AI] AI chunk 160-200 classified 40
+[2025-12-08 19:14:08.633][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:14:36.595][AI] AI meta chunk recv 2055 bytes
+[2025-12-08 19:14:36.597][AI] AI chunk 200-240 classified 40
+[2025-12-08 19:14:36.606][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:14:48.724][AI] AI meta chunk recv 2051 bytes
+[2025-12-08 19:14:48.727][AI] AI chunk 240-280 classified 40
+[2025-12-08 19:14:48.737][AI] AI meta chunk send (40 items, model gpt-5-mini)
+[2025-12-08 19:15:19.929][AI] AI meta chunk recv 2061 bytes
+[2025-12-08 19:15:19.931][AI] AI chunk 280-320 classified 40
+[2025-12-08 19:15:19.941][AI] AI meta chunk send (23 items, model gpt-5-mini)
+[2025-12-08 19:15:32.086][AI] AI meta chunk recv 1521 bytes
+[2025-12-08 19:15:32.088][AI] AI chunk 320-343 classified 23
+[2025-12-08 19:15:32.098][AI] AI chunk 0-40 sending with model gpt-5-mini
+[2025-12-08 19:15:46.285][AI] AI chunk 0-40 response 1202 bytes
+[2025-12-08 19:15:46.296][AI] AI chunk 40-80 sending with model gpt-5-mini
+[2025-12-08 19:15:59.481][AI] AI chunk 40-80 response 1161 bytes
+[2025-12-08 19:15:59.483][AI] AI chunk 80-120 sending with model gpt-5-mini
+[2025-12-08 19:16:20.295][AI] AI chunk 80-120 response 1382 bytes
+[2025-12-08 19:16:20.298][AI] AI chunk 120-160 sending with model gpt-5-mini
+[2025-12-08 19:16:35.208][AI] AI chunk 120-160 response 1728 bytes
+[2025-12-08 19:16:35.211][AI] AI chunk 160-200 sending with model gpt-5-mini
+[2025-12-08 19:16:56.798][AI] AI chunk 160-200 response 1417 bytes
+[2025-12-08 19:16:56.800][AI] AI chunk 200-240 sending with model gpt-5-mini
+[2025-12-08 19:17:11.609][AI] AI chunk 200-240 response 1441 bytes
+[2025-12-08 19:17:11.611][AI] AI chunk 240-280 sending with model gpt-5-mini
+[2025-12-08 19:17:37.619][AI] AI chunk 240-280 response 1489 bytes
+[2025-12-08 19:17:37.622][AI] AI chunk 280-320 sending with model gpt-5-mini
+[2025-12-08 19:18:10.075][AI] AI chunk 280-320 response 1705 bytes
+[2025-12-08 19:18:10.086][AI] AI chunk 320-360 sending with model gpt-5-mini
+[2025-12-08 19:18:32.451][AI] AI chunk 320-360 response 1513 bytes
+[2025-12-08 19:18:32.453][AI] AI chunk 360-400 sending with model gpt-5-mini
+[2025-12-08 19:18:51.745][AI] AI chunk 360-400 response 1393 bytes
+[2025-12-08 19:18:51.746][AI] AI chunk 400-411 sending with model gpt-5-mini
+[2025-12-08 19:19:04.281][AI] AI chunk 400-411 response 1054 bytes
+[2025-12-08 19:19:04.284][AI] AI paragraph levels collected: 284 of 411
+[2025-12-08 19:19:04.297][AI] AI paragraph types: 343
+[2025-12-08 19:19:04.308][AI] AI paragraph levels: 284
+[2025-12-08 19:19:04.331][DOCX] Copied original DOCX to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx
+[2025-12-08 19:19:04.335][PATCH] Building numbering targets from analysis...
+[2025-12-08 19:19:04.338][PATCH] AI types available: 343, AI levels available: 284
+[2025-12-08 19:19:04.340][PATCH] AI-guided body start at paragraph 30: I have served as the Chair of the 8 Artillery Row 
+[2025-12-08 19:19:04.342][PATCH] Body starts at paragraph index 30
+[2025-12-08 19:19:04.350][PATCH] Number para 30 level 0: I have served as the Chair of the 8 Artillery Row Residents 
+[2025-12-08 19:19:04.352][PATCH] Number para 31 level 0: The facts and matter set out in this statement are within my
+[2025-12-08 19:19:04.355][PATCH] Skip para 34 - AI type: title - WITNESS STATEMENT OF KEVIN HASTINGS
+[2025-12-08 19:19:04.358][PATCH] Skip para 35 - AI type: intro - I, Kevin Hastings of 21 Corbet Close, Wa
+[2025-12-08 19:19:04.360][PATCH] Number para 36 level 0: I have served as the Chair of the 8 Artillery Row Residents 
+[2025-12-08 19:19:04.363][PATCH] Number para 37 level 0: The facts and matter set out in this statement are within my
+[2025-12-08 19:19:04.365][PATCH] Skip para 38 - AI type: heading - A. INTRODUCTION AND CAPACITY
+[2025-12-08 19:19:04.367][PATCH] Number para 39 level 0: I lived at 8 Artillery Row with my family from April 2016 un
+[2025-12-08 19:19:04.370][PATCH] Number para 40 level 0: I make this statement on behalf of the Applicants. The facts
+[2025-12-08 19:19:04.372][PATCH] Number para 41 level 0: This statement supports the Applicants’ challenge to the ser
+[2025-12-08 19:19:04.374][PATCH] Number para 42 level 0: The statement is intended to be read alongside the Applicant
+[2025-12-08 19:19:04.376][PATCH] Number para 45 level 0: Period of overcharge/double charge
+[2025-12-08 19:19:04.378][PATCH] Number para 47 level 0: Heat and Hot water
+[2025-12-08 19:19:04.383][PATCH] Number para 50 level 0: £10,000 (or whatever the figure is)
+[2025-12-08 19:19:04.385][PATCH] Number para 52 level 0: Double charging of communal supply
+[2025-12-08 19:19:04.387][PATCH] Number para 54 level 0: £1.3m
+[2025-12-08 19:19:04.389][PATCH] Number para 60 level 0: AES Systems plant or Heat Interface Maintenance
+[2025-12-08 19:19:04.390][PATCH] Number para 67 level 0: The Respondent and its solicitors have suggested that they r
+[2025-12-08 19:19:04.392][PATCH] Number para 68 level 0: In reality, most of the documents now produced for this refe
+[2025-12-08 19:19:04.394][PATCH] Number para 69 level 0: What is genuinely new in this claim is very limited: a parti
+[2025-12-08 19:19:04.396][PATCH] Built 270 numbering targets. Sample: [30:0] [31:0] [36:0] [37:0] [39:0] [40:0] [41:0] [42:0] [45:0] [47:0]
+[2025-12-08 19:19:04.397][PATCH] Patcher will apply numbering to 270 paragraphs
+[2025-12-08 19:19:04.399][PATCH] Patcher: start for Draft Witness Statement of KH 2025.12.07_UKLegal.docx with 270 targets
+[2025-12-08 19:19:10.156][PATCH] Patcher: unzip ok to /Users/ukrbi/Library/Containers/com.kbkh.wordformat/Data/tmp/wordformat-patch-0D3A057E-EF80-4728-A2D6-F74C607C234B
+[2025-12-08 19:19:10.158][PATCH] Patcher: numbering.xml already present
+[2025-12-08 19:19:10.160][PATCH] Patcher: content-based injection into document.xml
+[2025-12-08 19:19:10.166][PATCH] Patcher: 267 unique text prefixes to match
+[2025-12-08 19:19:21.453][PATCH] Patcher: numbered 316 paragraphs by content match
+[2025-12-08 19:19:21.455][PATCH] Patcher: inject complete
+[2025-12-08 19:19:21.587][PATCH] Patcher: rezipped to /Users/ukrbi/Downloads/Draft Witness Statement of KH 2025.12.07_UKLegal.docx.tmp
+[2025-12-08 19:19:21.588][PATCH] Patcher: replaced original DOCX with patched version
+[2025-12-08 19:19:21.593][PATCH] Patcher completed successfully

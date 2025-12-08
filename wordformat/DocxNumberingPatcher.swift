@@ -51,7 +51,7 @@ struct DocxNumberingPatcher {
 
         if fm.fileExists(atPath: numberingXML.path) {
             Logger.shared.log("Patcher: numbering.xml exists, finding safe numId", category: "PATCH")
-            let existingXML = try String(contentsOf: numberingXML)
+            let existingXML = try String(contentsOf: numberingXML, encoding: .utf8)
             safeNumId = findSafeNumId(in: existingXML)
 
             // Append our numbering definition to existing file
@@ -129,6 +129,7 @@ struct DocxNumberingPatcher {
               <w:start w:val="1"/>
               <w:numFmt w:val="lowerLetter"/>
               <w:lvlText w:val="(%2)"/>
+              <w:lvlRestart w:val="1"/>
               <w:lvlJc w:val="left"/>
               <w:pPr><w:ind w:left="1440" w:hanging="360"/></w:pPr>
             </w:lvl>
@@ -136,6 +137,7 @@ struct DocxNumberingPatcher {
               <w:start w:val="1"/>
               <w:numFmt w:val="lowerRoman"/>
               <w:lvlText w:val="(%3)"/>
+              <w:lvlRestart w:val="2"/>
               <w:lvlJc w:val="left"/>
               <w:pPr><w:ind w:left="2160" w:hanging="360"/></w:pPr>
             </w:lvl>
@@ -177,7 +179,7 @@ struct DocxNumberingPatcher {
 
     /// Append our numbering definition to an existing numbering.xml
     private func appendNumberingDefinition(to numberingXML: URL, numId: Int, abstractNumId: Int) throws {
-        var xml = try String(contentsOf: numberingXML)
+        var xml = try String(contentsOf: numberingXML, encoding: .utf8)
 
         // Our abstract numbering definition
         let abstractDef = """
@@ -193,6 +195,7 @@ struct DocxNumberingPatcher {
               <w:start w:val="1"/>
               <w:numFmt w:val="lowerLetter"/>
               <w:lvlText w:val="(%2)"/>
+              <w:lvlRestart w:val="1"/>
               <w:lvlJc w:val="left"/>
               <w:pPr><w:ind w:left="1440" w:hanging="360"/></w:pPr>
             </w:lvl>
@@ -200,6 +203,7 @@ struct DocxNumberingPatcher {
               <w:start w:val="1"/>
               <w:numFmt w:val="lowerRoman"/>
               <w:lvlText w:val="(%3)"/>
+              <w:lvlRestart w:val="2"/>
               <w:lvlJc w:val="left"/>
               <w:pPr><w:ind w:left="2160" w:hanging="360"/></w:pPr>
             </w:lvl>
@@ -237,7 +241,7 @@ struct DocxNumberingPatcher {
             let base = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"></Relationships>"
             try base.data(using: .utf8)!.write(to: relsURL)
         }
-        var rels = try String(contentsOf: relsURL)
+        var rels = try String(contentsOf: relsURL, encoding: .utf8)
         if !rels.contains("numbering.xml") {
             let relLine = "<Relationship Id=\"rIdNumbering\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering\" Target=\"numbering.xml\"/>"
             rels = rels.replacingOccurrences(of: "</Relationships>", with: "  \(relLine)\n</Relationships>")
@@ -247,7 +251,7 @@ struct DocxNumberingPatcher {
 
         let ctypesURL = workDir.appendingPathComponent("[Content_Types].xml")
         guard fm.fileExists(atPath: ctypesURL.path) else { return }
-        var ctypes = try String(contentsOf: ctypesURL)
+        var ctypes = try String(contentsOf: ctypesURL, encoding: .utf8)
         if !ctypes.contains("word/numbering.xml") {
             let override = "<Override PartName=\"/word/numbering.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\"/>"
             ctypes = ctypes.replacingOccurrences(of: "</Types>", with: "  \(override)\n</Types>")
@@ -259,7 +263,7 @@ struct DocxNumberingPatcher {
     /// Index-based numbering - matches paragraphs by their sequential index in the document
     private func injectNumberingByContent(into documentXML: URL, targets: [NumberingTarget], numId: Int) throws {
         Logger.shared.log("Patcher: index-based injection into document.xml with numId=\(numId)", category: "PATCH")
-        let raw = try String(contentsOf: documentXML)
+        let raw = try String(contentsOf: documentXML, encoding: .utf8)
 
         // Build maps
         var indexToLevel: [Int: Int] = [:]
@@ -307,7 +311,12 @@ struct DocxNumberingPatcher {
                     continue
                 }
 
-                let newPara = injectNumPrIntoParagraph(para.xml, level: level, numId: numId)
+                var newParaXML = para.xml
+                // Strip existing textual marker for sublevels to avoid "(a) (a)" output
+                if level > 0 {
+                    newParaXML = stripMarkerFromParagraphXML(newParaXML)
+                }
+                let newPara = injectNumPrIntoParagraph(newParaXML, level: level, numId: numId)
                 replacements.append((para.range, newPara))
                 numberedCount += 1
 
@@ -344,6 +353,30 @@ struct DocxNumberingPatcher {
             }
         }
         return text
+    }
+
+    /// Remove leading manual marker like "1. " or "(a)" from the first text run in a paragraph XML.
+    private func stripMarkerFromParagraphXML(_ xml: String) -> String {
+        guard let pattern = try? NSRegularExpression(pattern: "(<w:t[^>]*>)([^<]*)(</w:t>)", options: [.dotMatchesLineSeparators]) else {
+            return xml
+        }
+        guard let match = pattern.firstMatch(in: xml, range: NSRange(xml.startIndex..., in: xml)) else {
+            return xml
+        }
+        let textRange = match.range(at: 2)
+        guard let swiftRange = Range(textRange, in: xml) else { return xml }
+        let textContent = String(xml[swiftRange])
+
+        // Detect leading markers (1. ) (a) a) (i) etc.
+        let markerPattern = try? NSRegularExpression(pattern: "^\\s*(\\d+[.)]|\\([a-zA-Z]\\)|[a-zA-Z]\\)|\\([ivxIVX]+\\))\\s+", options: [])
+        if let marker = markerPattern,
+           marker.firstMatch(in: textContent, range: NSRange(location: 0, length: textContent.utf16.count)) != nil {
+            let cleaned = marker.stringByReplacingMatches(in: textContent, options: [], range: NSRange(location: 0, length: textContent.utf16.count), withTemplate: "")
+            var newXML = xml
+            newXML.replaceSubrange(swiftRange, with: cleaned)
+            return newXML
+        }
+        return xml
     }
 
     /// Normalize text for matching (lowercase, remove extra whitespace)

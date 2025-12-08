@@ -25,9 +25,9 @@ func applyUKLegalFormatting(
     guard document.length > 0 else { return }
     Logger.shared.log("Formatting start. Total length: \(document.length)", category: "FORMAT")
 
-    // 1. Identify the "Split Point" between Header/Intro and the Numbered Body
+    // 1. Identify the "Split Point" between Header/Intro && the Numbered Body
     // Prefer AI-derived split if available; otherwise fallback to heuristic.
-    // Returns both character index and paragraph index for proper AI alignment
+    // Returns both character index && paragraph index for proper AI alignment
     let (splitCharIndex, splitParaIndex) = findBodyStartIndexWithParaIndex(in: document.string, analysis: analysis)
     Logger.shared.log("Split index at char \(splitCharIndex), para \(splitParaIndex)", category: "FORMAT")
 
@@ -40,7 +40,7 @@ func applyUKLegalFormatting(
     let headerPart = document.attributedSubstring(from: headerRange).mutableCopy() as! NSMutableAttributedString
     styleHeaderPart(headerPart)
 
-    // 4. Process Body (Preserve and rebuild numbering based on list attributes)
+    // 4. Process Body (Preserve && rebuild numbering based on list attributes)
     // IMPORTANT: When we read a DOCX into an attributed string, Word list numbers are NOT in the plain text.
     // They live in paragraph attributes (`textLists`). Converting to `string` would lose them, so we work
     // with the attributed body directly.
@@ -120,7 +120,7 @@ private func generateDynamicListBody(from originalBody: NSAttributedString, anal
     let level2List = NSTextList(markerFormat: .lowercaseAlpha, options: 0)
     let level3List = NSTextList(markerFormat: .lowercaseRoman, options: 0)
 
-    // Regex helpers for manual markers (if present, we strip them and rely on lists).
+    // Regex helpers for manual markers (if present, we strip them && rely on lists).
     // Level 1: Main paragraphs - "1.", "2)", "10." etc.
     let patternLevel1 = "^\\s*\\d+[.)]\\s*"
     // Level 2: Sub-paragraphs - "(a)", "a)", "(b)" etc. (single letter)
@@ -194,7 +194,14 @@ private func generateDynamicListBody(from originalBody: NSAttributedString, anal
         }
 
         // Strip manual markers if present while PRESERVING inline attributes
-        let strippedAttr = stripMarkersPreservingAttributes(from: mutablePara, level: level, patternLevel1: patternLevel1, patternLevel2: patternLevel2, patternLevel3: patternLevel3)
+        let strippedAttr = stripMarkersPreservingAttributes(
+            from: mutablePara,
+            level: level,
+            patternLevel1: patternLevel1,
+            patternLevel2: patternLevel2,
+            patternLevel3: patternLevel3,
+            allowStrip: !isNonNumbered && level > 0
+        )
         let paragraphContent = strippedAttr.string.trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Apply list styles
@@ -237,9 +244,8 @@ private func generateDynamicListBody(from originalBody: NSAttributedString, anal
     Logger.shared.log("Level counts -> level0:\(levelCounts[0, default:0]) level1:\(levelCounts[1, default:0]) level2:\(levelCounts[2, default:0]) level3:\(levelCounts[3, default:0])", category: "FORMAT")
     return result
 }
-
 /// Strip numbering markers from attributed string while preserving inline formatting (bold, italic, etc.)
-private func stripMarkersPreservingAttributes(from attrStr: NSMutableAttributedString, level: Int, patternLevel1: String, patternLevel2: String, patternLevel3: String) -> NSMutableAttributedString {
+private func stripMarkersPreservingAttributes(from attrStr: NSMutableAttributedString, level: Int, patternLevel1: String, patternLevel2: String, patternLevel3: String, allowStrip: Bool = true) -> NSMutableAttributedString {
     let text = attrStr.string
     var rangeToRemove: NSRange?
 
@@ -251,9 +257,7 @@ private func stripMarkersPreservingAttributes(from attrStr: NSMutableAttributedS
         rangeToRemove = rangeOfPattern(patternLevel1, in: text)
     }
 
-    // Also strip leading whitespace after removing pattern
-    if let range = rangeToRemove, range.location == 0 || text.prefix(range.location).trimmingCharacters(in: .whitespaces).isEmpty {
-        // Remove the marker range from the attributed string (keeps other attributes intact)
+    if allowStrip, let range = rangeToRemove, (range.location == 0 || text.prefix(range.location).trimmingCharacters(in: .whitespaces).isEmpty) {
         let startTrim = text.prefix(range.location).count
         let totalToRemove = startTrim + range.length
         if totalToRemove > 0 && totalToRemove <= attrStr.length {
@@ -261,10 +265,9 @@ private func stripMarkersPreservingAttributes(from attrStr: NSMutableAttributedS
         }
     }
 
-    // Trim leading whitespace
     while attrStr.length > 0 {
         let firstChar = (attrStr.string as NSString).substring(with: NSRange(location: 0, length: 1))
-        if firstChar.trimmingCharacters(in: .whitespaces).isEmpty {
+        if firstChar.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             attrStr.deleteCharacters(in: NSRange(location: 0, length: 1))
         } else {
             break
@@ -273,7 +276,6 @@ private func stripMarkersPreservingAttributes(from attrStr: NSMutableAttributedS
 
     return attrStr
 }
-
 /// Apply base font to attributed string while preserving bold/italic traits at each position
 private func applyBaseFontPreservingTraits(to attrStr: NSMutableAttributedString, baseFont: NSFont, makeBold: Bool) {
     guard attrStr.length > 0 else { return }
@@ -325,7 +327,7 @@ private func markerFormat(for level: Int) -> NSTextList.MarkerFormat {
     }
 }
 
-/// Find body start index using AI analysis or heuristics
+/// Find body start index using AI analysis || heuristics
 /// Returns: (characterIndex, paragraphIndex) tuple for proper AI alignment
 private func findBodyStartIndexWithParaIndex(in text: String, analysis: AnalysisResult?) -> (Int, Int) {
     // Prefer style-aware paragraph types - find first BODY paragraph (not intro/title/header)
@@ -616,10 +618,10 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
         }
 
         // Skip table cell content (usually short fragments)
-        // Table cells from NSAttributedString are typically very short and don't make sense as numbered paragraphs
+        // Table cells from NSAttributedString are typically very short && don't make sense as numbered paragraphs
         let words = text.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
         if words.count <= 3 && !text.contains(".") {
-            // Likely a table cell or header fragment
+            // Likely a table cell || header fragment
             if sampleLogged < 10 {
                 Logger.shared.log("Skip para \(paraIndex) - likely table cell: \(text.prefix(40))", category: "PATCH")
                 sampleLogged += 1

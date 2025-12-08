@@ -261,69 +261,46 @@ struct DocxNumberingPatcher {
         Logger.shared.log("Patcher: index-based injection into document.xml with numId=\(numId)", category: "PATCH")
         let raw = try String(contentsOf: documentXML)
 
-        // Build a map from paragraph index to level
+        // Build maps
         var indexToLevel: [Int: Int] = [:]
+        var prefixQueue = targets.filter { !$0.textPrefix.isEmpty }
+        prefixQueue.sort { $0.paragraphIndex < $1.paragraphIndex }
         for target in targets {
             indexToLevel[target.paragraphIndex] = target.level
         }
-        Logger.shared.log("Patcher: \(indexToLevel.count) paragraphs to number", category: "PATCH")
+        Logger.shared.log("Patcher: \(indexToLevel.count) paragraphs to number (index map), \(prefixQueue.count) with prefixes", category: "PATCH")
 
-        // Find table boundaries to skip table content
-        let tableStartPattern = try NSRegularExpression(pattern: "<w:tbl[^>]*>", options: [])
-        let tableEndPattern = try NSRegularExpression(pattern: "</w:tbl>", options: [])
-
-        var tableRanges: [NSRange] = []
-        var tableStarts: [Int] = []
-
-        tableStartPattern.enumerateMatches(in: raw, range: NSRange(raw.startIndex..., in: raw)) { match, _, _ in
-            if let range = match?.range {
-                tableStarts.append(range.location)
-            }
-        }
-
-        tableEndPattern.enumerateMatches(in: raw, range: NSRange(raw.startIndex..., in: raw)) { match, _, _ in
-            if let range = match?.range, !tableStarts.isEmpty {
-                let start = tableStarts.removeFirst()
-                tableRanges.append(NSRange(location: start, length: range.location + range.length - start))
-            }
-        }
-
-        // Check if a location is inside a table
-        func isInsideTable(_ location: Int) -> Bool {
-            for range in tableRanges {
-                if location >= range.location && location < range.location + range.length {
-                    return true
-                }
-            }
-            return false
-        }
-
-        // Find all paragraphs in document order (outside tables)
-        // Use a non-greedy pattern that properly handles nested elements
+        // Find all paragraphs in document order (including tables to keep indices aligned)
         let paragraphPattern = try NSRegularExpression(pattern: "<w:p(?:\\s[^>]*)?>(?:(?!</w:p>).)*</w:p>", options: [.dotMatchesLineSeparators])
 
         var allParagraphs: [(range: NSRange, xml: String)] = []
         paragraphPattern.enumerateMatches(in: raw, range: NSRange(raw.startIndex..., in: raw)) { match, _, _ in
             guard let matchRange = match?.range else { return }
-
-            // Skip paragraphs inside tables
-            if isInsideTable(matchRange.location) { return }
-
             let startIdx = raw.index(raw.startIndex, offsetBy: matchRange.location)
             let endIdx = raw.index(raw.startIndex, offsetBy: matchRange.location + matchRange.length)
             let paraXML = String(raw[startIdx..<endIdx])
-
             allParagraphs.append((matchRange, paraXML))
         }
 
-        Logger.shared.log("Patcher: found \(allParagraphs.count) paragraphs outside tables", category: "PATCH")
+        Logger.shared.log("Patcher: found \(allParagraphs.count) paragraphs (all)", category: "PATCH")
 
         // Build replacements based on paragraph index
         var replacements: [(range: NSRange, newContent: String)] = []
         var numberedCount = 0
 
         for (index, para) in allParagraphs.enumerated() {
-            if let level = indexToLevel[index] {
+            var level: Int? = indexToLevel[index]
+
+            // If no direct index match, attempt prefix match in order
+            if level == nil, !prefixQueue.isEmpty {
+                let text = extractTextFromParagraphXML(para.xml)
+                if let pos = prefixQueue.firstIndex(where: { !text.isEmpty && text.hasPrefix($0.textPrefix) }) {
+                    level = prefixQueue[pos].level
+                    prefixQueue.remove(at: pos)
+                }
+            }
+
+            if let level = level {
                 // Skip if paragraph already has numbering
                 if para.xml.contains("<w:numPr>") {
                     Logger.shared.log("Patcher: para \(index) already has numPr, skipping", category: "PATCH")

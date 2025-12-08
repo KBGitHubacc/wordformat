@@ -27,8 +27,6 @@ struct OpenAIService {
             defer { index += 1 }
             let raw = substring ?? ""
             let text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-            if text.isEmpty { return }
-            
             let font = doc.attribute(.font, at: range.location, effectiveRange: nil) as? NSFont
             let style = doc.attribute(.paragraphStyle, at: range.location, effectiveRange: nil) as? NSParagraphStyle
             let isBold = font?.fontDescriptor.symbolicTraits.contains(.bold) ?? false
@@ -134,7 +132,7 @@ struct OpenAIService {
         - "title": The main document title (e.g., "WITNESS STATEMENT OF...").
         - "intro": The introductory paragraph ("I, Name, will say...").
         - "body": The main numbered paragraphs of the witness statement.
-        - "heading": Section headings (e.g., "A. INTRODUCTION").
+        - "heading": Section headings (e.g., "INTRODUCTION").
         - "quote": Block quotes or indented text.
         - "statementOfTruth": The statement of truth paragraph.
         - "signature": The date and signature block.

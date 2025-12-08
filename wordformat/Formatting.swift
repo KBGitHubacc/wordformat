@@ -101,8 +101,13 @@ private func generateHTML(
     """
     
     // -- Step B: Process Paragraphs --
-    var listCounter = 1
-    var isInList = false
+    // Track numbering so the resulting DOCX relies on Word's native list
+    // numbering instead of fixed text. This preserves numbering if paragraphs
+    // are added or removed later.
+    var isInMainList = false
+    var hasOpenMainListItem = false
+    var isInSubList = false
+    var lastMainNumber: Int = 0
     
     for item in structure {
         // Skip header items from the original doc as we just generated a fresh one
@@ -117,10 +122,20 @@ private func generateHTML(
             continue
         }
         
-        // Close list if we were in one but this item is NOT a body paragraph
-        if isInList && item.type != .body {
-            html += "</ol>"
-            isInList = false
+        // Close list structures if we are switching away from body paragraphs
+        if item.type != .body {
+            if isInSubList {
+                html += "</ol></li>"
+                isInSubList = false
+                hasOpenMainListItem = false
+            } else if hasOpenMainListItem {
+                html += "</li>"
+                hasOpenMainListItem = false
+            }
+            if isInMainList {
+                html += "</ol>"
+                isInMainList = false
+            }
         }
         
         switch item.type {
@@ -134,48 +149,69 @@ private func generateHTML(
             html += "<p class='heading'>\(cleanText)</p>"
             
         case .body:
-            // List Handling
-            // 1. Check for Sub-points "(a)"
-            if isSubPoint(cleanText) {
-                // To support nested lists in flat HTML generation, we close the main list,
-                // start a type='a' list. This is complex to get right for continuity.
-                // Simplified robust approach: Treat as an indented paragraph or a bullet.
-                // Ideally: Word handles nested lists best if they are strictly hierarchical.
-                
-                // For now, we will render sub-points as part of the main list but manually styled,
-                // OR simpler: Use a separate list type.
-                
-                // Let's stick to the MAIN numbered list for the "1, 2, 3" requirement.
-                // If it's a sub-point, we strip the marker and just indent it?
-                // No, user wants sub-paragraph numbering kept.
-                
-                // If we are in a main number list, pause it?
-                // Let's assume for this version we format MAIN paragraphs as <ol>
-                // and sub-paragraphs we print as text to avoid breaking the main sequence 1..2..3
-                
-                // STRATEGY: Strip the manual "1." but KEEP the manual "(a)".
-                // Only apply <ol> to the main points.
-                
-                let stripped = stripManualNumbering(cleanText)
-                if isInList {
-                    html += "</ol>"
-                    isInList = false
+            let numbering = parseParagraphNumber(cleanText)
+            let content = stripManualNumbering(cleanText)
+
+            switch numbering {
+            case .main(let number):
+                // Close any open sublist tied to the previous main item
+                if isInSubList {
+                    html += "</ol></li>"
+                    isInSubList = false
+                    hasOpenMainListItem = false
+                } else if hasOpenMainListItem {
+                    html += "</li>"
+                    hasOpenMainListItem = false
                 }
-                // Render sub-point as indented block
-                html += "<p style='margin-left: 72pt;'>\(cleanText)</p>"
-                
-            } else {
-                // Main Paragraph "1."
-                if !isInList {
-                    // Start list at current counter
-                    html += "<ol start='\(listCounter)'>"
-                    isInList = true
+
+                // Start or restart the main list at the detected number
+                if !isInMainList {
+                    html += "<ol start='\(number)'>"
+                    isInMainList = true
+                } else if number != lastMainNumber + 1 {
+                    // Restart list if manual numbering jumps (preserve original numbering)
+                    html += "</ol><ol start='\(number)'>"
                 }
-                
-                // Strip "1." or "304." so we don't get double numbers
-                let content = stripManualNumbering(cleanText)
+
+                html += "<li>\(content)"
+                hasOpenMainListItem = true
+                lastMainNumber = number
+
+            case .sub(let letter):
+                // Ensure we have a main list + open item to attach the sublist to
+                if !isInMainList {
+                    html += "<ol start='1'>"
+                    isInMainList = true
+                    lastMainNumber = 1
+                }
+                if !hasOpenMainListItem {
+                    html += "<li>"
+                    hasOpenMainListItem = true
+                }
+
+                let startValue = max(1, letterListIndex(letter))
+
+                if !isInSubList {
+                    html += "<ol type='a' start='\(startValue)'>"
+                    isInSubList = true
+                }
                 html += "<li>\(content)</li>"
-                listCounter += 1
+
+            case .none:
+                // Treat as a standard paragraph outside of numbered lists
+                if isInSubList {
+                    html += "</ol></li>"
+                    isInSubList = false
+                    hasOpenMainListItem = false
+                } else if hasOpenMainListItem {
+                    html += "</li>"
+                    hasOpenMainListItem = false
+                }
+                if isInMainList {
+                    html += "</ol>"
+                    isInMainList = false
+                }
+                html += "<p>\(cleanText)</p>"
             }
             
         case .quote:
@@ -192,7 +228,13 @@ private func generateHTML(
         }
     }
     
-    if isInList {
+    if isInSubList {
+        html += "</ol>"
+    }
+    if hasOpenMainListItem {
+        html += "</li>"
+    }
+    if isInMainList {
         html += "</ol>"
     }
     
@@ -284,8 +326,8 @@ private func detectDocumentStructure(in document: NSAttributedString) -> [Analys
 // MARK: - Utilities
 
 private func stripManualNumbering(_ text: String) -> String {
-    // Removes "1.", "1 ", "304." from start of string
-    let pattern = "^\\s*\\d+[.)]\\s+"
+    // Removes "1.", "1 ", "304.", "(a)" from start of string
+    let pattern = "^\\s*(?:\\d+|\\([a-zA-Z]\\))[.)]?\\s+"
     if let regex = try? NSRegularExpression(pattern: pattern) {
         let range = NSRange(location: 0, length: text.utf16.count)
         return regex.stringByReplacingMatches(in: text, options: [], range: range, withTemplate: "")
@@ -293,9 +335,43 @@ private func stripManualNumbering(_ text: String) -> String {
     return text
 }
 
-private func isSubPoint(_ text: String) -> Bool {
-    // Detects (a), a., (i)
-    return text.range(of: "^\\s*\\(?[a-zA-Z]\\)[.)]", options: .regularExpression) != nil
+private enum ParagraphNumbering {
+    case main(Int)
+    case sub(Character)
+    case none
+}
+
+/// Parses a paragraph's leading numbering so we can rebuild it using
+/// native Word list semantics rather than fixed text.
+private func parseParagraphNumber(_ text: String) -> ParagraphNumbering {
+    let nsRange = NSRange(location: 0, length: text.utf16.count)
+
+    if let mainMatch = try? NSRegularExpression(pattern: "^\\s*(\\d+)[.)]?") {
+        if let result = mainMatch.firstMatch(in: text, options: [], range: nsRange),
+           let range = Range(result.range(at: 1), in: text),
+           let value = Int(text[range]) {
+            return .main(value)
+        }
+    }
+
+    if let subMatch = try? NSRegularExpression(pattern: "^\\s*\\(?([a-zA-Z])\\)[.)]?") {
+        if let result = subMatch.firstMatch(in: text, options: [], range: nsRange),
+           let range = Range(result.range(at: 1), in: text),
+           let char = text[range].first {
+            return .sub(char)
+        }
+    }
+
+    return .none
+}
+
+/// Returns the alphabetical index for a subparagraph marker (a/A -> 1).
+private func letterListIndex(_ letter: Character) -> Int {
+    let alphabet = Array("abcdefghijklmnopqrstuvwxyz")
+    if let idx = alphabet.firstIndex(of: Character(letter.lowercased())) {
+        return idx + 1
+    }
+    return 1
 }
 
 private func containsAny(_ text: String, keywords: [String]) -> Bool {

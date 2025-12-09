@@ -336,15 +336,12 @@ struct DocxNumberingPatcher {
             let normalized = normalizeForMatching(String(para.text.prefix(80)))
             if normalized.isEmpty { continue }
 
-            // Find matching prefix from targets and get the level from buildNumberingTargetsFromAnalysis
+            // Find matching prefix from targets
             var matchedLevel: Int? = nil
             var matchedPrefix: String? = nil
 
             for (prefix, level) in prefixToLevel {
-                // Check if this prefix was already used
                 if usedPrefixes.contains(prefix) { continue }
-
-                // Match: normalized text starts with prefix OR prefix starts with normalized text
                 if normalized.hasPrefix(prefix) || (prefix.hasPrefix(normalized) && normalized.count >= 15) {
                     matchedLevel = level
                     matchedPrefix = prefix
@@ -352,35 +349,34 @@ struct DocxNumberingPatcher {
                 }
             }
 
-            // Process if we found a matching prefix (body paragraph)
-            if let matchedLevel = matchedLevel, let prefix = matchedPrefix {
-                usedPrefixes.insert(prefix)  // Mark as used
-                var level = matchedLevel
+            // CRITICAL: Process paragraph if it matches targets OR has existing Word numbering
+            // This ensures ALL numbered paragraphs get consistent numbering with our numId
+            let hasExistingNumbering = para.existingLevel != nil
 
-                // IMPORTANT: Check existing Word numbering level first
-                // If the original document has this paragraph at ilvl=1 (subparagraph), preserve that!
-                if let existingLevel = para.existingLevel, existingLevel > level {
-                    Logger.shared.log("Patcher: para \(index) has existing Word ilvl=\(existingLevel), upgrading from \(level)", category: "PATCH")
-                    level = existingLevel
+            if matchedLevel != nil || hasExistingNumbering {
+                if let prefix = matchedPrefix {
+                    usedPrefixes.insert(prefix)
                 }
 
-                // Check if the XML text has a letter/roman marker that wasn't detected
-                // This handles cases where the text is "a. Something" but was detected as level 0
+                // Start with existing Word level (preserves subparagraph structure)
+                // Fall back to matched level, then 0
+                var level = para.existingLevel ?? matchedLevel ?? 0
+
+                // Check if XML text has markers that indicate a different level
                 let textMarkerLevel = detectLevelFromText(para.text)
                 if textMarkerLevel > level {
-                    Logger.shared.log("Patcher: upgrading para \(index) from level \(level) to \(textMarkerLevel) based on text marker", category: "PATCH")
+                    Logger.shared.log("Patcher: para \(index) upgrading from \(level) to \(textMarkerLevel) based on text marker", category: "PATCH")
                     level = textMarkerLevel
                 }
 
                 var newParaXML = para.xml
 
-                // Remove existing Word numbering if present - we'll apply our own
+                // Remove existing Word numbering - we'll apply our own with consistent numId
                 if newParaXML.contains("<w:numPr>") {
                     newParaXML = removeExistingNumbering(from: newParaXML)
                 }
 
-                // Strip letter/roman markers if detected in text (regardless of final level)
-                // This handles "a. Text" -> "Text" when we apply "(a)" numbering
+                // Strip text markers if present (e.g., "a. Text" -> "Text")
                 if textMarkerLevel > 0 {
                     newParaXML = stripMarkerFromParagraphXML(newParaXML, level: textMarkerLevel)
                 }
@@ -389,8 +385,8 @@ struct DocxNumberingPatcher {
                 replacements.append((para.range, newPara))
                 numberedCount += 1
 
-                if numberedCount <= 20 || numberedCount % 25 == 0 {
-                    Logger.shared.log("Patcher: #\(numberedCount) para \(index) level \(level) (existingLvl=\(para.existingLevel.map(String.init) ?? "nil")): \(para.text.prefix(50))", category: "PATCH")
+                if numberedCount <= 25 || numberedCount % 25 == 0 {
+                    Logger.shared.log("Patcher: #\(numberedCount) para \(index) level \(level) (existing=\(para.existingLevel.map(String.init) ?? "nil") matched=\(matchedLevel.map(String.init) ?? "nil")): \(para.text.prefix(45))", category: "PATCH")
                 }
             }
         }

@@ -270,13 +270,23 @@ struct DocxNumberingPatcher {
         var prefixToLevel: [String: Int] = [:]
         var usedPrefixes: Set<String> = []  // Track used prefixes to avoid double-numbering
 
+        var level0Count = 0
+        var level1Count = 0
+        var level2Count = 0
+
         for target in targets {
             let normalized = normalizeForMatching(target.textPrefix)
             if !normalized.isEmpty && normalized.count >= 10 {  // Require meaningful prefix
                 prefixToLevel[normalized] = target.level
+                switch target.level {
+                case 0: level0Count += 1
+                case 1: level1Count += 1
+                case 2: level2Count += 1
+                default: break
+                }
             }
         }
-        Logger.shared.log("Patcher: \(prefixToLevel.count) unique text prefixes for matching", category: "PATCH")
+        Logger.shared.log("Patcher: \(prefixToLevel.count) unique prefixes (L0:\(level0Count) L1:\(level1Count) L2:\(level2Count))", category: "PATCH")
 
         // Find table boundaries to skip table content
         let tableStartPattern = try NSRegularExpression(pattern: "<w:tbl[^>]*>", options: [])
@@ -321,14 +331,12 @@ struct DocxNumberingPatcher {
         var numberedCount = 0
 
         for (index, para) in allParagraphs.enumerated() {
-            // Skip if paragraph already has numbering
-            if para.xml.contains("<w:numPr>") { continue }
-
             // Skip empty paragraphs
             let normalized = normalizeForMatching(String(para.text.prefix(80)))
             if normalized.isEmpty { continue }
 
-            // Find matching prefix
+            // Find matching prefix from targets and get the level from buildNumberingTargetsFromAnalysis
+            // That function uses INDENTATION and context to detect subparagraphs, not just text markers
             var matchedLevel: Int? = nil
             var matchedPrefix: String? = nil
 
@@ -344,28 +352,37 @@ struct DocxNumberingPatcher {
                 }
             }
 
+            // Process if we found a matching prefix
             if var level = matchedLevel, let prefix = matchedPrefix {
                 usedPrefixes.insert(prefix)  // Mark as used
 
-                // Re-detect level from actual XML text content if original level is 0
-                // This catches cases where the original detection failed
-                if level == 0 {
-                    let detectedLevel = detectLevelFromText(para.text)
-                    if detectedLevel > 0 {
-                        level = detectedLevel
-                        Logger.shared.log("Patcher: upgraded para \(index) from level 0 to \(level)", category: "PATCH")
-                    }
+                // Check if the XML text has a letter/roman marker that wasn't detected
+                // This handles cases where the text is "a. Something" but was detected as level 0
+                let textMarkerLevel = detectLevelFromText(para.text)
+                if textMarkerLevel > level {
+                    Logger.shared.log("Patcher: upgrading para \(index) from level \(level) to \(textMarkerLevel) based on text marker", category: "PATCH")
+                    level = textMarkerLevel
                 }
 
                 var newParaXML = para.xml
-                // Always strip markers for all levels (including level 0)
-                newParaXML = stripMarkerFromParagraphXML(newParaXML, level: level)
+
+                // Remove existing Word numbering if present - we'll apply our own
+                if newParaXML.contains("<w:numPr>") {
+                    newParaXML = removeExistingNumbering(from: newParaXML)
+                }
+
+                // Strip letter/roman markers if detected in text (regardless of final level)
+                // This handles "a. Text" -> "Text" when we apply "(a)" numbering
+                if textMarkerLevel > 0 {
+                    newParaXML = stripMarkerFromParagraphXML(newParaXML, level: textMarkerLevel)
+                }
+
                 let newPara = injectNumPrIntoParagraph(newParaXML, level: level, numId: numId)
                 replacements.append((para.range, newPara))
                 numberedCount += 1
 
-                if numberedCount <= 10 || numberedCount % 25 == 0 {
-                    Logger.shared.log("Patcher: #\(numberedCount) para \(index) level \(level): \(para.text.prefix(40))", category: "PATCH")
+                if numberedCount <= 20 || numberedCount % 25 == 0 {
+                    Logger.shared.log("Patcher: #\(numberedCount) para \(index) level \(level): \(para.text.prefix(50))", category: "PATCH")
                 }
             }
         }
@@ -398,9 +415,32 @@ struct DocxNumberingPatcher {
         return text
     }
 
-    /// Remove leading manual marker like "1. " or "(a)" from the first text run in a paragraph XML.
-    /// Now strips ANY marker type regardless of detected level to handle misdetection.
+    /// Remove existing <w:numPr> element from paragraph XML
+    /// This allows us to replace incorrect existing numbering with our own
+    private func removeExistingNumbering(from xml: String) -> String {
+        // Pattern to match <w:numPr>...</w:numPr> including nested content
+        guard let pattern = try? NSRegularExpression(
+            pattern: "<w:numPr>.*?</w:numPr>",
+            options: [.dotMatchesLineSeparators]
+        ) else {
+            return xml
+        }
+
+        return pattern.stringByReplacingMatches(
+            in: xml,
+            range: NSRange(location: 0, length: xml.utf16.count),
+            withTemplate: ""
+        )
+    }
+
+    /// Remove leading markers from the first text run in a paragraph XML.
+    /// For subparagraphs (level 1, 2), also strips any incorrect number prefix like "145."
+    /// The level parameter indicates what type of marker to strip.
     private func stripMarkerFromParagraphXML(_ xml: String, level: Int) -> String {
+        // Only strip markers for subparagraphs (level 1 and 2)
+        // Level 0 (main paragraphs) should not have their text stripped
+        if level == 0 { return xml }
+
         guard let pattern = try? NSRegularExpression(pattern: "(<w:t[^>]*>)([^<]*)(</w:t>)", options: [.dotMatchesLineSeparators]) else {
             return xml
         }
@@ -409,41 +449,51 @@ struct DocxNumberingPatcher {
         }
         let textRange = match.range(at: 2)
         guard let swiftRange = Range(textRange, in: xml) else { return xml }
-        let textContent = String(xml[swiftRange])
+        var textContent = String(xml[swiftRange])
+        let originalContent = textContent
 
-        // Try all marker patterns - strip whatever is found
-        // Order matters: try more specific patterns first
-        let markerPatterns: [(String, String)] = [
-            // Level 2: Roman numerals
-            ("^\\s*\\([ivxIVX]+\\)\\s*", "(roman)"),           // "(i)", "(ii)"
-            ("^\\s*[ivxIVX]+\\)\\s*", "roman)"),               // "i)", "ii)"
-            ("^\\s*[ivxIVX]+\\.\\s*", "roman."),               // "i.", "ii."
+        // First, strip any leading number prefix (like "145. " or "145) ") that shouldn't be there
+        // This handles cases like "145. a. Gas..." where 145 is an incorrect paragraph number
+        let numberPrefixPattern = "^\\s*\\d+[.):]?\\s*"
+        if let numRegex = try? NSRegularExpression(pattern: numberPrefixPattern, options: []) {
+            textContent = numRegex.stringByReplacingMatches(in: textContent, range: NSRange(location: 0, length: textContent.utf16.count), withTemplate: "")
+        }
 
-            // Level 1: Single letters (but not i, v, x which might be roman)
-            ("^\\s*\\([a-zA-Z]\\)\\s*", "(letter)"),           // "(a)", "(b)"
-            ("^\\s*[a-zA-Z]\\)\\s*", "letter)"),               // "a)", "b)"
-            ("^\\s*[a-zA-Z]\\.\\s+", "letter."),               // "a. ", "b. " (requires space)
-
-            // Level 0: Numbers
-            ("^\\s*\\d+\\.\\s*", "num."),                      // "1.", "12."
-            ("^\\s*\\d+\\)\\s*", "num)"),                      // "1)", "12)"
-        ]
-
-        var result = textContent
-        var strippedSomething = false
-
-        for (markerPattern, _) in markerPatterns {
-            guard let regex = try? NSRegularExpression(pattern: markerPattern, options: []) else { continue }
-            if regex.firstMatch(in: result, range: NSRange(location: 0, length: result.utf16.count)) != nil {
-                result = regex.stringByReplacingMatches(in: result, range: NSRange(location: 0, length: result.utf16.count), withTemplate: "")
-                strippedSomething = true
-                break  // Only strip the first marker found
+        // Strip subparagraph markers based on level
+        if level == 1 {
+            // Level 1: Strip letter markers like "(a)", "a)", "a."
+            let letterPatterns = [
+                "^\\s*\\([a-zA-Z]\\)\\s*",    // "(a) "
+                "^\\s*[a-zA-Z]\\)\\s*",        // "a) "
+                "^\\s*[a-zA-Z]\\.\\s*"         // "a. " or "a."
+            ]
+            for markerPattern in letterPatterns {
+                guard let regex = try? NSRegularExpression(pattern: markerPattern, options: []) else { continue }
+                if regex.firstMatch(in: textContent, range: NSRange(location: 0, length: textContent.utf16.count)) != nil {
+                    textContent = regex.stringByReplacingMatches(in: textContent, range: NSRange(location: 0, length: textContent.utf16.count), withTemplate: "")
+                    break
+                }
+            }
+        } else if level == 2 {
+            // Level 2: Strip roman numeral markers like "(i)", "i)", "i."
+            let romanPatterns = [
+                "^\\s*\\([ivxIVX]+\\)\\s*",   // "(i) ", "(ii) "
+                "^\\s*[ivxIVX]+\\)\\s*",       // "i) ", "ii) "
+                "^\\s*[ivxIVX]+\\.\\s*"        // "i. ", "ii. "
+            ]
+            for markerPattern in romanPatterns {
+                guard let regex = try? NSRegularExpression(pattern: markerPattern, options: [.caseInsensitive]) else { continue }
+                if regex.firstMatch(in: textContent, range: NSRange(location: 0, length: textContent.utf16.count)) != nil {
+                    textContent = regex.stringByReplacingMatches(in: textContent, range: NSRange(location: 0, length: textContent.utf16.count), withTemplate: "")
+                    break
+                }
             }
         }
 
-        if strippedSomething {
+        // Only modify XML if we actually stripped something
+        if textContent != originalContent {
             var newXML = xml
-            newXML.replaceSubrange(swiftRange, with: result)
+            newXML.replaceSubrange(swiftRange, with: textContent)
             return newXML
         }
 
@@ -480,25 +530,36 @@ struct DocxNumberingPatcher {
     /// Detect numbering level from text content
     /// Returns: 0 = main paragraph, 1 = subparagraph (a), 2 = sub-subparagraph (i)
     private func detectLevelFromText(_ text: String) -> Int {
-        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return 0 }
 
-        // Level 2 patterns (roman numerals) - check first as they're more specific
+        // Optional number prefix that may exist from original Word numbering
+        // e.g., "145. a. Text" or "145) a. Text" or "145 a. Text"
+        let optionalNumPrefix = "(?:\\d+[.):]?\\s*)?"
+
+        // Level 2 patterns (roman numerals ii, iii, iv, etc.) - check first as they're more specific
+        // Single 'i' is ambiguous, so we handle it separately
         let level2Patterns = [
-            "^\\([ivxIVX]+\\)",           // "(i)", "(ii)", "(iii)"
-            "^[ivxIVX]+\\)",              // "i)", "ii)"
-            "^[ivxIVX]+\\.\\s"            // "i. " (with space)
+            "^" + optionalNumPrefix + "\\((?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\)",  // "(ii)", "(iii)", "(iv)"...
+            "^" + optionalNumPrefix + "(?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\)",     // "ii)", "iii)"...
+            "^" + optionalNumPrefix + "(?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\.",     // "ii.", "iii."...
+            "^\\((?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\)"                            // Just "(ii)" at start
         ]
         for pattern in level2Patterns {
-            if trimmed.range(of: pattern, options: .regularExpression) != nil {
+            if trimmed.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil {
                 return 2
             }
         }
 
-        // Level 1 patterns (single letters) - exclude if looks like roman numeral
+        // Level 1 patterns (single letters a-z)
+        // These patterns detect subparagraph markers like "(a)", "a)", "a."
         let level1Patterns = [
-            "^\\([a-zA-Z]\\)",            // "(a)", "(b)"
-            "^[a-hj-uwyzA-HJ-UWYZ]\\)",   // "a)", "b)" - exclude i,v,x which could be roman
-            "^[a-hj-uwyzA-HJ-UWYZ]\\.\\s" // "a. " - exclude i,v,x
+            "^" + optionalNumPrefix + "\\([a-zA-Z]\\)\\s*",        // "(a) " or "(a)"
+            "^" + optionalNumPrefix + "[a-zA-Z]\\)\\s*",            // "a) " or "a)"
+            "^" + optionalNumPrefix + "[a-zA-Z]\\.\\s+",            // "a. " (requires space after dot)
+            "^" + optionalNumPrefix + "[a-zA-Z]\\.[A-Z]",           // "a.Text" (no space, capital follows)
+            "^\\([a-zA-Z]\\)\\s*",                                  // Just "(a)" at start
+            "^[a-zA-Z]\\)\\s*"                                      // Just "a)" at start
         ]
         for pattern in level1Patterns {
             if trimmed.range(of: pattern, options: .regularExpression) != nil {
@@ -506,12 +567,10 @@ struct DocxNumberingPatcher {
             }
         }
 
-        // Check for single letter markers that could be ambiguous (i, v, x)
-        // If preceded by letters like (a), (b)... in context, treat as level 1
-        if trimmed.range(of: "^\\([ivxIVX]\\)", options: .regularExpression) != nil {
-            // Single letter in parens that's also a roman numeral - default to level 1
-            // unless it's part of a sequence like (i), (ii), (iii)
-            return 1
+        // Check for single "(i)" which could be level 1 or level 2 - treat as level 1
+        let singleRomanPattern = "^" + optionalNumPrefix + "\\([ivxIVX]\\)\\s*"
+        if trimmed.range(of: singleRomanPattern, options: [.regularExpression, .caseInsensitive]) != nil {
+            return 1  // Single roman numeral in parens - treat as subparagraph
         }
 
         return 0

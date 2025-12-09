@@ -335,65 +335,130 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
     let ns = doc.string as NSString
     let (_, bodyStartPara) = findBodyStartIndexWithParaIndex(in: doc.string, analysis: analysis)
 
-    // Improved patterns for level detection (more flexible - allow optional space after marker)
+    // Improved patterns for level detection (more flexible)
+    // Optional number prefix: "145. " or "145) " or "145 " (number followed by punctuation and optional space)
+    let optionalNumPrefix = "(?:\\d+[.):]?\\s*)?"
+
     // Level 1 (subparagraph): "(a)", "a)", "a." - single letter
+    // Made more flexible: space after marker is now optional with \\s* instead of \\s+
     let level1Patterns = [
-        "^\\s*\\([a-zA-Z]\\)\\s*",      // "(a)" or "(a) "
-        "^\\s*[a-zA-Z]\\)\\s*",          // "a)" or "a) "
-        "^\\s*[a-zA-Z]\\.\\s+"           // "a. " (letter-dot requires space to avoid matching abbreviations)
+        "^\\s*" + optionalNumPrefix + "\\([a-zA-Z]\\)\\s*",           // "(a)" or "145. (a)"
+        "^\\s*" + optionalNumPrefix + "[a-zA-Z]\\)\\s*",               // "a)" or "145. a)"
+        "^\\s*" + optionalNumPrefix + "[a-zA-Z]\\.\\s+",               // "a. " or "145. a. " (with space)
+        "^\\s*" + optionalNumPrefix + "[a-zA-Z]\\.[A-Z]",              // "a.Text" (no space, capital letter follows)
+        "^\\s*\\([a-zA-Z]\\)\\s*",                                      // Just "(a)" at start
+        "^\\s*[a-zA-Z]\\)\\s*"                                          // Just "a)" at start
     ]
 
-    // Level 2 (sub-subparagraph): "(i)", "i)", "i." - roman numerals
+    // Level 2 (sub-subparagraph): "(i)", "i)", "i." - roman numerals (ii, iii, iv, etc.)
+    // Note: Single 'i' is ambiguous so we check multi-char roman numerals
     let level2Patterns = [
-        "^\\s*\\([ivxIVX]+\\)\\s*",      // "(i)" or "(ii)"
-        "^\\s*[ivxIVX]+\\)\\s*",          // "i)" or "ii)"
-        "^\\s*[ivxIVX]+\\.\\s+"           // "i. " (requires space)
+        "^\\s*" + optionalNumPrefix + "\\((?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\)\\s*",  // "(ii)", "(iii)"
+        "^\\s*" + optionalNumPrefix + "(?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\)\\s*",     // "ii)", "iii)"
+        "^\\s*" + optionalNumPrefix + "(?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\.\\s*",     // "ii. ", "iii. "
+        "^\\s*\\((?:ii|iii|iv|vi|vii|viii|ix|xi|xii)[ivxIVX]*\\)\\s*"                            // Just "(ii)" at start
     ]
 
-    var paraIndex = 0
-    var sampleLogged = 0
-
+    // First pass: collect all paragraph texts for context-based detection
+    var paragraphTexts: [(index: Int, text: String, range: NSRange)] = []
+    var tempIndex = 0
     ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byParagraphs) { substring, substringRange, _, _ in
-        defer { paraIndex += 1 }
-        guard paraIndex >= bodyStartPara else { return }
-
         let text = (substring ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        if text.isEmpty { return }
+        if tempIndex >= bodyStartPara && !text.isEmpty {
+            paragraphTexts.append((tempIndex, text, substringRange))
+        }
+        tempIndex += 1
+    }
+
+    var sampleLogged = 0
+    var inListContext = false  // Track if we're inside a list (after ":")
+    var detectionSamplesLogged = 0
+
+    Logger.shared.log("Starting level detection for \(paragraphTexts.count) body paragraphs", category: "FORMAT")
+
+    for (i, para) in paragraphTexts.enumerated() {
+        let paraIndex = para.index
+        let text = para.text
+        let substringRange = para.range
 
         // Skip non-numbered types
-        if let t = aiTypes[paraIndex], nonNumberedTypes.contains(t) { return }
+        if let t = aiTypes[paraIndex], nonNumberedTypes.contains(t) { continue }
 
         // Skip Heuristics
-        if text.lowercased().contains("statement of truth") || isHeading(text) { return }
+        if text.lowercased().contains("statement of truth") || isHeading(text) { continue }
 
         // Determine Level
         var level = 0
+        var detectionMethod = "none"
+
         if let aiLevel = aiLevels[paraIndex] {
             level = aiLevel
+            detectionMethod = "AI"
         } else {
             // Check level 2 first (roman numerals) - more specific
             let isLevel2 = level2Patterns.contains { pattern in
                 text.range(of: pattern, options: .regularExpression) != nil
             }
 
-            // Check level 1 (letters) - but exclude if it's actually a roman numeral
+            // Check level 1 (letters)
             let isLevel1 = !isLevel2 && level1Patterns.contains { pattern in
                 text.range(of: pattern, options: .regularExpression) != nil
             }
 
             if isLevel2 {
                 level = 2
+                detectionMethod = "pattern-roman"
             } else if isLevel1 {
                 level = 1
+                detectionMethod = "pattern-letter"
             } else {
+                // Context-based detection: check if previous paragraph ends with ":"
+                // and this paragraph ends with ";" or "; and" or "; or"
+                if i > 0 {
+                    let prevText = paragraphTexts[i - 1].text
+                    let prevEndsWithColon = prevText.hasSuffix(":") || prevText.hasSuffix("that:") ||
+                                            prevText.hasSuffix(": ") || prevText.hasSuffix(":\n")
+                    let thisEndsWithSemicolon = text.hasSuffix(";") ||
+                                                 text.hasSuffix("; and") ||
+                                                 text.hasSuffix("; or") ||
+                                                 text.hasSuffix(";and") ||
+                                                 text.hasSuffix(";or") ||
+                                                 text.hasSuffix("; ") ||
+                                                 text.hasSuffix(";\n")
+                    let thisEndsWithPeriodAfterList = inListContext && text.hasSuffix(".")
+
+                    // Log context detection details for debugging
+                    if detectionSamplesLogged < 10 && (prevEndsWithColon || inListContext) {
+                        Logger.shared.log("Context check para \(paraIndex): prevColon=\(prevEndsWithColon) inList=\(inListContext) endsSemi=\(thisEndsWithSemicolon) text='\(text.suffix(30))'", category: "FORMAT")
+                        detectionSamplesLogged += 1
+                    }
+
+                    if prevEndsWithColon {
+                        inListContext = true
+                    }
+
+                    if inListContext && (thisEndsWithSemicolon || thisEndsWithPeriodAfterList) {
+                        level = 1  // This is a list item (subparagraph)
+                        detectionMethod = "context-semicolon"
+                        // Check if this is the last item (ends with period)
+                        if text.hasSuffix(".") && !text.hasSuffix("etc.") {
+                            inListContext = false  // End of list
+                        }
+                    } else if !thisEndsWithSemicolon && !prevEndsWithColon {
+                        inListContext = false  // Reset list context
+                    }
+                }
+
                 // Fallback: check indentation from paragraph style
-                if substringRange.location < doc.length {
+                if level == 0 && substringRange.location < doc.length {
                     let safeLocation = min(substringRange.location, doc.length - 1)
                     if let style = doc.attribute(.paragraphStyle, at: safeLocation, effectiveRange: nil) as? NSParagraphStyle {
                         if style.headIndent >= 72 || style.firstLineHeadIndent >= 72 {
                             level = 2
+                            detectionMethod = "indent-72"
                         } else if style.headIndent >= 36 || style.firstLineHeadIndent >= 36 {
                             level = 1
+                            detectionMethod = "indent-36"
                         }
                     }
                 }
@@ -402,11 +467,16 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
 
         // Log samples for debugging
         if sampleLogged < 30 && level > 0 {
-            Logger.shared.log("Target para \(paraIndex) level \(level): \(text.prefix(60))", category: "PATCH")
+            Logger.shared.log("Target para \(paraIndex) level \(level) (\(detectionMethod)): \(text.prefix(60))", category: "PATCH")
             sampleLogged += 1
         }
 
-        // We capture longer prefix for content matching (80 chars instead of 50)
+        // Also log some level 0 samples to see what's NOT being detected
+        if sampleLogged < 5 && level == 0 && i < 20 {
+            Logger.shared.log("Level0 para \(paraIndex): '\(text.prefix(50))...\(text.suffix(20))'", category: "FORMAT")
+        }
+
+        // We capture longer prefix for content matching
         targets.append(.init(paragraphIndex: paraIndex, level: level, textPrefix: String(text.prefix(80))))
     }
 

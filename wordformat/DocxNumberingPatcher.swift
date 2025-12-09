@@ -312,7 +312,7 @@ struct DocxNumberingPatcher {
         // Find all paragraphs outside tables
         let paragraphPattern = try NSRegularExpression(pattern: "<w:p(?:\\s[^>]*)?>(?:(?!</w:p>).)*</w:p>", options: [.dotMatchesLineSeparators])
 
-        var allParagraphs: [(range: NSRange, xml: String, text: String)] = []
+        var allParagraphs: [(range: NSRange, xml: String, text: String, existingLevel: Int?)] = []
         paragraphPattern.enumerateMatches(in: raw, range: NSRange(raw.startIndex..., in: raw)) { match, _, _ in
             guard let matchRange = match?.range else { return }
             if isInsideTable(matchRange.location) { return }  // Skip table paragraphs
@@ -321,7 +321,8 @@ struct DocxNumberingPatcher {
             let endIdx = raw.index(raw.startIndex, offsetBy: matchRange.location + matchRange.length)
             let paraXML = String(raw[startIdx..<endIdx])
             let text = extractTextFromParagraphXML(paraXML)
-            allParagraphs.append((matchRange, paraXML, text))
+            let existingLevel = extractExistingLevel(from: paraXML)
+            allParagraphs.append((matchRange, paraXML, text, existingLevel))
         }
 
         Logger.shared.log("Patcher: found \(allParagraphs.count) paragraphs outside tables", category: "PATCH")
@@ -336,7 +337,6 @@ struct DocxNumberingPatcher {
             if normalized.isEmpty { continue }
 
             // Find matching prefix from targets and get the level from buildNumberingTargetsFromAnalysis
-            // That function uses INDENTATION and context to detect subparagraphs, not just text markers
             var matchedLevel: Int? = nil
             var matchedPrefix: String? = nil
 
@@ -352,9 +352,17 @@ struct DocxNumberingPatcher {
                 }
             }
 
-            // Process if we found a matching prefix
-            if var level = matchedLevel, let prefix = matchedPrefix {
+            // Process if we found a matching prefix (body paragraph)
+            if let matchedLevel = matchedLevel, let prefix = matchedPrefix {
                 usedPrefixes.insert(prefix)  // Mark as used
+                var level = matchedLevel
+
+                // IMPORTANT: Check existing Word numbering level first
+                // If the original document has this paragraph at ilvl=1 (subparagraph), preserve that!
+                if let existingLevel = para.existingLevel, existingLevel > level {
+                    Logger.shared.log("Patcher: para \(index) has existing Word ilvl=\(existingLevel), upgrading from \(level)", category: "PATCH")
+                    level = existingLevel
+                }
 
                 // Check if the XML text has a letter/roman marker that wasn't detected
                 // This handles cases where the text is "a. Something" but was detected as level 0
@@ -382,7 +390,7 @@ struct DocxNumberingPatcher {
                 numberedCount += 1
 
                 if numberedCount <= 20 || numberedCount % 25 == 0 {
-                    Logger.shared.log("Patcher: #\(numberedCount) para \(index) level \(level): \(para.text.prefix(50))", category: "PATCH")
+                    Logger.shared.log("Patcher: #\(numberedCount) para \(index) level \(level) (existingLvl=\(para.existingLevel.map(String.init) ?? "nil")): \(para.text.prefix(50))", category: "PATCH")
                 }
             }
         }
@@ -413,6 +421,25 @@ struct DocxNumberingPatcher {
             }
         }
         return text
+    }
+
+    /// Extract existing numbering level from XML paragraph
+    /// Returns the ilvl value if the paragraph has existing Word numbering, nil otherwise
+    private func extractExistingLevel(from xml: String) -> Int? {
+        // First check if numPr exists
+        guard xml.contains("<w:numPr>") else { return nil }
+
+        // Look for <w:ilvl w:val="N"/> anywhere in the XML
+        // The ilvl element specifies the numbering level (0-based)
+        guard let pattern = try? NSRegularExpression(
+            pattern: "<w:ilvl\\s+w:val=\"(\\d+)\"",
+            options: []
+        ) else { return nil }
+
+        guard let match = pattern.firstMatch(in: xml, range: NSRange(xml.startIndex..., in: xml)),
+              let range = Range(match.range(at: 1), in: xml) else { return nil }
+
+        return Int(xml[range])
     }
 
     /// Remove existing <w:numPr> element from paragraph XML

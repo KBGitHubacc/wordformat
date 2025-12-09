@@ -391,76 +391,62 @@ func buildNumberingTargetsFromAnalysis(doc: NSAttributedString, analysis: Analys
         var level = 0
         var detectionMethod = "none"
 
+        // Pattern detection first
+        let isLevel2 = level2Patterns.contains { pattern in
+            text.range(of: pattern, options: .regularExpression) != nil
+        }
+        let isLevel1 = !isLevel2 && level1Patterns.contains { pattern in
+            text.range(of: pattern, options: .regularExpression) != nil
+        }
+        if isLevel2 {
+            level = 2; detectionMethod = "pattern-roman"
+        } else if isLevel1 {
+            level = 1; detectionMethod = "pattern-letter"
+        }
+
+        // AI override (use max to respect explicit markers)
         if let aiLevel = aiLevels[paraIndex] {
-            level = aiLevel
-            detectionMethod = "AI"
-        } else {
-            // Check level 2 first (roman numerals) - more specific
-            let isLevel2 = level2Patterns.contains { pattern in
-                text.range(of: pattern, options: .regularExpression) != nil
+            if aiLevel > level { level = aiLevel; detectionMethod = "AI" }
+        }
+
+        // Context-based detection when still level 0
+        if level == 0 && i > 0 {
+            let prevText = paragraphTexts[i - 1].text
+            let prevEndsWithColon = prevText.hasSuffix(":") || prevText.hasSuffix("that:") ||
+                                    prevText.hasSuffix(": ") || prevText.hasSuffix(":\n")
+            let thisEndsWithSemicolon = text.hasSuffix(";") ||
+                                         text.hasSuffix("; and") ||
+                                         text.hasSuffix("; or") ||
+                                         text.hasSuffix(";and") ||
+                                         text.hasSuffix(";or") ||
+                                         text.hasSuffix("; ") ||
+                                         text.hasSuffix(";\n")
+            let thisEndsWithPeriodAfterList = inListContext && text.hasSuffix(".")
+
+            if detectionSamplesLogged < 10 && (prevEndsWithColon || inListContext) {
+                Logger.shared.log("Context check para \(paraIndex): prevColon=\(prevEndsWithColon) inList=\(inListContext) endsSemi=\(thisEndsWithSemicolon) text='\(text.suffix(30))'", category: "FORMAT")
+                detectionSamplesLogged += 1
             }
 
-            // Check level 1 (letters)
-            let isLevel1 = !isLevel2 && level1Patterns.contains { pattern in
-                text.range(of: pattern, options: .regularExpression) != nil
-            }
+            if prevEndsWithColon { inListContext = true }
 
-            if isLevel2 {
-                level = 2
-                detectionMethod = "pattern-roman"
-            } else if isLevel1 {
+            if inListContext && (thisEndsWithSemicolon || thisEndsWithPeriodAfterList) {
                 level = 1
-                detectionMethod = "pattern-letter"
-            } else {
-                // Context-based detection: check if previous paragraph ends with ":"
-                // and this paragraph ends with ";" or "; and" or "; or"
-                if i > 0 {
-                    let prevText = paragraphTexts[i - 1].text
-                    let prevEndsWithColon = prevText.hasSuffix(":") || prevText.hasSuffix("that:") ||
-                                            prevText.hasSuffix(": ") || prevText.hasSuffix(":\n")
-                    let thisEndsWithSemicolon = text.hasSuffix(";") ||
-                                                 text.hasSuffix("; and") ||
-                                                 text.hasSuffix("; or") ||
-                                                 text.hasSuffix(";and") ||
-                                                 text.hasSuffix(";or") ||
-                                                 text.hasSuffix("; ") ||
-                                                 text.hasSuffix(";\n")
-                    let thisEndsWithPeriodAfterList = inListContext && text.hasSuffix(".")
+                detectionMethod = "context-semicolon"
+                if text.hasSuffix(".") && !text.hasSuffix("etc.") { inListContext = false }
+            } else if !thisEndsWithSemicolon && !prevEndsWithColon {
+                inListContext = false
+            }
+        }
 
-                    // Log context detection details for debugging
-                    if detectionSamplesLogged < 10 && (prevEndsWithColon || inListContext) {
-                        Logger.shared.log("Context check para \(paraIndex): prevColon=\(prevEndsWithColon) inList=\(inListContext) endsSemi=\(thisEndsWithSemicolon) text='\(text.suffix(30))'", category: "FORMAT")
-                        detectionSamplesLogged += 1
-                    }
-
-                    if prevEndsWithColon {
-                        inListContext = true
-                    }
-
-                    if inListContext && (thisEndsWithSemicolon || thisEndsWithPeriodAfterList) {
-                        level = 1  // This is a list item (subparagraph)
-                        detectionMethod = "context-semicolon"
-                        // Check if this is the last item (ends with period)
-                        if text.hasSuffix(".") && !text.hasSuffix("etc.") {
-                            inListContext = false  // End of list
-                        }
-                    } else if !thisEndsWithSemicolon && !prevEndsWithColon {
-                        inListContext = false  // Reset list context
-                    }
-                }
-
-                // Fallback: check indentation from paragraph style
-                if level == 0 && substringRange.location < doc.length {
-                    let safeLocation = min(substringRange.location, doc.length - 1)
-                    if let style = doc.attribute(.paragraphStyle, at: safeLocation, effectiveRange: nil) as? NSParagraphStyle {
-                        if style.headIndent >= 72 || style.firstLineHeadIndent >= 72 {
-                            level = 2
-                            detectionMethod = "indent-72"
-                        } else if style.headIndent >= 36 || style.firstLineHeadIndent >= 36 {
-                            level = 1
-                            detectionMethod = "indent-36"
-                        }
-                    }
+        // Fallback: indentation if still level 0
+        if level == 0 && substringRange.location < doc.length {
+            let safeLocation = min(substringRange.location, doc.length - 1)
+            if let style = doc.attribute(.paragraphStyle, at: safeLocation, effectiveRange: nil) as? NSParagraphStyle {
+                if style.headIndent >= 72 || style.firstLineHeadIndent >= 72 {
+                    level = 2; detectionMethod = "indent-72"
+                } else if style.headIndent >= 36 || style.firstLineHeadIndent >= 36 {
+                    level = 1; detectionMethod = "indent-36"
                 }
             }
         }

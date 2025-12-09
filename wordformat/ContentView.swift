@@ -130,7 +130,7 @@ struct ContentView: View {
             // 4. Build numbering targets from analysis
             status += "\nAnalysing paragraphs..."
             let targets = buildNumberingTargetsFromAnalysis(
-                doc: docForAnalysis,
+                doc: docForAnalysis, // use unmodified doc with original markers
                 analysis: analysisResult
             )
 

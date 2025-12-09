@@ -327,6 +327,13 @@ struct DocxNumberingPatcher {
 
         Logger.shared.log("Patcher: found \(allParagraphs.count) paragraphs outside tables", category: "PATCH")
 
+        // Log first 15 paragraphs with their existing levels for debugging
+        for (i, para) in allParagraphs.prefix(15).enumerated() {
+            if para.existingLevel != nil || !para.text.isEmpty {
+                Logger.shared.log("Patcher DEBUG: para \(i) existingLvl=\(para.existingLevel.map(String.init) ?? "nil") text='\(para.text.prefix(50))'", category: "PATCH")
+            }
+        }
+
         // Build replacements by matching content
         var replacements: [(range: NSRange, newContent: String)] = []
         var numberedCount = 0
@@ -364,6 +371,12 @@ struct DocxNumberingPatcher {
 
                 // Check if XML text has markers that indicate a different level
                 let textMarkerLevel = detectLevelFromText(para.text)
+
+                // Log when we detect potential subparagraph markers
+                if textMarkerLevel > 0 && numberedCount < 30 {
+                    Logger.shared.log("Patcher: para \(index) textMarker=\(textMarkerLevel) existing=\(para.existingLevel.map(String.init) ?? "nil") text='\(para.text.prefix(40))'", category: "PATCH")
+                }
+
                 if textMarkerLevel > level {
                     Logger.shared.log("Patcher: para \(index) upgrading from \(level) to \(textMarkerLevel) based on text marker", category: "PATCH")
                     level = textMarkerLevel
